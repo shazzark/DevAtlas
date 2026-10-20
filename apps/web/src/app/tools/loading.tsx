@@ -1,0 +1,3 @@
+export default function ToolsLoading() {
+  return <main id="main-content" aria-busy="true" aria-label="Loading technology catalog" className="mx-auto min-h-[70vh] w-[min(1120px,calc(100%-40px))] animate-pulse py-12 md:py-20"><div className="mb-10 border-b border-border pb-9"><div className="mb-4 h-3 w-44 rounded bg-surface-muted" /><div className="mb-4 h-12 max-w-md rounded bg-surface-muted" /><div className="h-5 max-w-xl rounded bg-surface-muted" /></div><div className="mb-8 h-16 rounded-xl bg-surface-muted" /><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{Array.from({ length: 6 }, (_, index) => <div className="h-56 rounded-xl border border-border bg-surface" key={index} />)}</div></main>;
+}

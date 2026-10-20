@@ -29,19 +29,23 @@ For a container or hosted Fastify deployment, set `HOST=0.0.0.0` as required by 
 
 Fastify implements `GET /api/health` (`200 {"status":"ok"}`) and `GET /api/health/ready` (`200 {"status":"ready"}` after a real MongoDB ping, otherwise `503 {"status":"not_ready","message":"..."}`). The web app proxies these through same-path BFF routes for frontend-to-backend checks. Database driver details and connection strings are not returned to callers.
 
+The Technology Explorer adds `GET /api/technologies?q=&category=&page=&limit=` (`200 {"items":[],"pagination":{},"categories":[]}`) and `GET /api/technologies/:slug` (`200 {"item":{...}}`). Invalid query input returns `400`; missing or unpublished slugs return `404`; unavailable MongoDB returns a safe `503`. Matching same-origin BFF routes are available at `/api/technologies` and `/api/technologies/:slug`.
+
+With a local or dedicated development `MONGODB_URI` configured, seed the approved catalog using `npm run seed:technologies --workspace=@devatlas/api`. This idempotently upserts only the 12 technology slugs and leaves current version values unset until verified.
+
 ## Verification
 
 - `npm run typecheck` builds shared contracts and checks all workspaces with strict TypeScript.
-- `npm test` runs shared-contract and API unit/integration tests. The live Mongo readiness test runs only when `PHASE15_MONGODB_TEST_URI` points to a dedicated local/test database; it performs a ping and writes no data.
+- `npm test` runs shared-contract and API unit/integration tests. Live Mongo readiness and technology tests run only when `PHASE15_MONGODB_TEST_URI` and `PHASE2_MONGODB_TEST_URI` point to dedicated local/test databases. The technology suite creates and removes only uniquely named fixture records.
 - `npm run build` builds shared contracts, the Fastify API and Next.js web app.
-- `npm run test:e2e` runs Playwright against the web and API started together. Install Chromium once with `npx playwright install chromium` if needed.
+- `npm run test:e2e` runs Playwright against the web and API started together. The technology journeys expect the local database to have been seeded. Install Chromium once with `npx playwright install chromium` if needed.
 
 Tailwind CSS v4 is the primary web styling system, with the existing CSS variables mapped to Tailwind theme tokens. Global CSS retains the theme values, base styles and the distinctive atlas illustration. React Icons remain the icon set.
 
 ## Environment variables
 
-`apps/api/.env.example`: `MONGODB_URI`, `PHASE15_MONGODB_TEST_URI`, `HOST`, `PORT`, and `LOG_LEVEL`.
+`apps/api/.env.example`: `MONGODB_URI`, `PHASE15_MONGODB_TEST_URI`, `PHASE2_MONGODB_TEST_URI`, `HOST`, `PORT`, and `LOG_LEVEL`.
 
 `apps/web/.env.example`: server-only `API_BASE_URL`.
 
-Use real Atlas credentials only in protected local environment files or a secret manager. Never commit secrets. Atlas credentials and a hosting target are not required for local work or the current health slice.
+Use real Atlas credentials only in protected local environment files or a secret manager. Never commit secrets. Atlas credentials and a hosting target are not required for local development or the catalog integration tests.

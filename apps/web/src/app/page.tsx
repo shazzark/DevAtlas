@@ -16,14 +16,14 @@ export default function HomePage() {
           <h1 id="hero-title">The tools move fast.<br /><span>Make sense of them.</span></h1>
           <p className="hero-intro">A calmer way to keep up with the technologies behind your work — what they do, what changed, and how they fit together.</p>
           <div className="hero-actions">
-            <a className="button button-primary" href="#explore">Explore the atlas <FiArrowRight aria-hidden="true" /></a>
+            <a className="button button-primary" href="/tools">Explore the atlas <FiArrowRight aria-hidden="true" /></a>
             <a className="text-link" href="#whats-new">See what’s new <FiArrowDownRight aria-hidden="true" /></a>
           </div>
-          <div aria-label="Search is not available yet" className="search-entry" id="search">
-            <FiSearch aria-hidden="true" />
-            <span>Search technologies, releases, and guides</span>
-            <span className="search-soon">Coming soon</span>
-          </div>
+          <form action="/tools" className="search-entry" id="search" role="search">
+            <label className="sr-only" htmlFor="home-search">Search technologies</label><FiSearch aria-hidden="true" />
+            <input className="min-w-0 flex-1 bg-transparent text-text outline-none placeholder:text-text-faint" id="home-search" name="q" placeholder="Search technologies…" />
+            <button aria-label="Search" className="search-soon cursor-pointer" type="submit">Search</button>
+          </form>
         </div>
         <div aria-hidden="true" className="hero-art">
           <div className="orbit orbit-outer" /><div className="orbit orbit-inner" />
@@ -69,7 +69,7 @@ export default function HomePage() {
 
       <section aria-label="Explore DevAtlas" className="closing page-wrap">
         <p>Keep your curiosity close.</p>
-        <Link className="closing-link" href="#explore">Start with the stack <FiArrowRight aria-hidden="true" /></Link>
+        <Link className="closing-link" href="/tools">Start with the stack <FiArrowRight aria-hidden="true" /></Link>
       </section>
     </main>
   );

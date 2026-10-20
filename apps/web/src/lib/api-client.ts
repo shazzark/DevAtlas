@@ -1,8 +1,15 @@
 import "server-only";
-import { healthResponseSchema, readinessResponseSchema, type HealthResponse, type ReadinessResponse } from "@devatlas/shared";
+import {
+  healthResponseSchema, readinessResponseSchema, technologyDetailResponseSchema, technologyListResponseSchema,
+  type HealthResponse, type ReadinessResponse, type TechnologyListQuery, type Technology,
+} from "@devatlas/shared";
 
 const DEFAULT_API_BASE_URL = "http://127.0.0.1:4001";
 const REQUEST_TIMEOUT_MS = 4_000;
+
+export class ApiClientError extends Error {
+  constructor(readonly status: number, readonly body: unknown) { super(`Backend request failed with status ${status}`); this.name = "ApiClientError"; }
+}
 
 function apiUrl(path: string): URL {
   const base = process.env.API_BASE_URL ?? DEFAULT_API_BASE_URL;
@@ -10,7 +17,9 @@ function apiUrl(path: string): URL {
   if ((url.protocol !== "https:" && url.protocol !== "http:") || url.username || url.password || url.search || url.hash) {
     throw new Error("API_BASE_URL must be a plain HTTP or HTTPS origin");
   }
-  url.pathname = `${url.pathname.replace(/\/$/, "")}${path}`;
+  const [pathname, search] = path.split("?", 2);
+  url.pathname = `${url.pathname.replace(/\/$/, "")}${pathname}`;
+  if (search) url.search = search;
   return url;
 }
 
@@ -22,6 +31,7 @@ async function get<T>(path: string, parse: (body: unknown) => T): Promise<{ stat
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   const body: unknown = await response.json();
+  if (path.startsWith("/api/technologies") && !response.ok) throw new ApiClientError(response.status, body);
   return { status: response.status, data: parse(body) };
 }
 
@@ -31,5 +41,16 @@ export const apiClient = {
   },
   getReadiness(): Promise<{ status: number; data: ReadinessResponse }> {
     return get("/api/health/ready", (body) => readinessResponseSchema.parse(body));
+  },
+  async listTechnologies(query: Partial<TechnologyListQuery> = {}) {
+    const params = new URLSearchParams();
+    for (const key of ["q", "category", "page", "limit"] as const) {
+      const value = query[key];
+      if (value !== undefined && value !== "") params.set(key, String(value));
+    }
+    return get(`/api/technologies${params.size ? `?${params}` : ""}`, (body) => technologyListResponseSchema.parse(body));
+  },
+  async getTechnology(slug: string): Promise<{ status: number; data: { item: Technology } }> {
+    return get(`/api/technologies/${encodeURIComponent(slug)}`, (body) => technologyDetailResponseSchema.parse(body));
   },
 };

@@ -89,3 +89,7 @@ The product owner approved the PDF as the initial specification on 20 October 20
 ## Delivery architecture update
 
 The user approved a separate frontend and backend before Phase 2: `apps/web` renders the product with Next.js and Tailwind CSS; `apps/api` owns backend logic and MongoDB through Fastify and Mongoose; `packages/shared` contains only reusable API contracts. This changes delivery boundaries, not the product scope above. The browser continues to use the web application; Next.js makes server-side requests to Fastify.
+
+### Phase 2 delivery notes
+
+The Technology Explorer now exposes published catalog entries with text search, category filtering and pagination. Technology detail pages include the approved content sections, official documentation references and version values only when verified. The initial 12 records are seeded from official documentation links; current-version fields remain explicitly unverified until an official release source is checked. Search is MongoDB-backed and does not require an external provider.

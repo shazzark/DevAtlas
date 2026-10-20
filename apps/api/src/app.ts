@@ -1,11 +1,15 @@
 import Fastify, { type FastifyInstance } from "fastify";
 import type { ApiConfig } from "./config.js";
-import { closeMongoConnection, checkMongoReadiness } from "./infrastructure/database/mongoose.js";
+import { closeMongoConnection, checkMongoReadiness, connectMongo } from "./infrastructure/database/mongoose.js";
 import { registerHealthRoutes, type ReadinessCheck } from "./features/health/routes.js";
+import { registerTechnologyRoutes } from "./features/technologies/routes.js";
+import type { TechnologyService } from "./features/technologies/service.js";
 
 export type AppDependencies = {
   checkDatabase?: ReadinessCheck;
   closeDatabase?: () => Promise<void>;
+  connectDatabase?: () => Promise<void>;
+  technologyService?: TechnologyService;
 };
 
 export function buildApp(config: ApiConfig, dependencies: AppDependencies = {}): FastifyInstance {
@@ -20,6 +24,7 @@ export function buildApp(config: ApiConfig, dependencies: AppDependencies = {}):
 
   const checkDatabase = dependencies.checkDatabase ?? (() => checkMongoReadiness(config.mongoUri));
   registerHealthRoutes(app, checkDatabase);
+  registerTechnologyRoutes(app, dependencies.technologyService, dependencies.connectDatabase ?? (() => connectMongo(config.mongoUri)));
   app.addHook("onClose", async () => {
     await (dependencies.closeDatabase ?? closeMongoConnection)();
   });

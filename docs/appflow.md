@@ -53,3 +53,7 @@ See [`prd.md`](prd.md), [`trd.md`](trd.md), [`design-system.md`](design-system.m
 ### Phase 1.5 delivery update
 
 Frontend requests to Fastify use server-side BFF paths. `GET /api/health` proxies liveness and `GET /api/health/ready` proxies readiness while preserving the backend status. The API remains independently callable on its configured service origin. The UI has an explicit backend-unavailable response state.
+
+### Phase 2 Technology Explorer flow
+
+Visitors open `/tools`, enter an optional search term, choose an optional category, and submit a standard GET form. Next.js renders the validated page and pagination from the typed Fastify response. Selecting a card opens `/tools/[slug]`, which presents purpose, use cases, fit guidance, setup, concepts, highlighted examples, related tools, official links and verification status. Empty search results offer a clear-filter link. API and database failures render a safe retry state; missing or unpublished slugs render not-found. The BFF exposes same-origin `GET /api/technologies` and `GET /api/technologies/:slug` for browser-facing API access.

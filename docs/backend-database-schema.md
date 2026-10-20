@@ -65,6 +65,14 @@ Introduce schemas and indexes alongside each vertical slice. Verify schema valid
 - Backend environment is isolated in `apps/api` (`MONGODB_URI`, `PHASE15_MONGODB_TEST_URI`, `HOST`, `PORT`, `LOG_LEVEL`). Web environment uses server-only `API_BASE_URL` in `apps/web`.
 - `packages/shared` publishes compiled health response schemas/types. Root scripts build it before API/web builds and local development.
 
+### Implemented Phase 2 Technology module
+
+`apps/api/src/features/technologies` owns the Mongoose model, repository, service, Zod-validated Fastify routes, integration tests and idempotent seed command. MongoDB collection `technologies` has a unique `slug` index, published-list indexes on `{status, category, name, _id}` and `{status, name, _id}`, and a text index over `name`, `shortDescription` and `overview`. Public reads filter on `status: published`; the response mapper removes lifecycle and database fields. The model also carries human-readable `alternatives`, `relatedSlugs`, nullable `version.current` / `version.releasedAt` / `version.sourceUrl` / `version.lastVerifiedAt`, and fields ready for future release and guide references.
+
+Shared Zod contracts define the query and response shapes. `GET /api/technologies?q=&category=&page=&limit=` returns `{items, pagination, categories}`; `GET /api/technologies/:slug` returns `{item}`. The list defaults to page 1 and 12 items, with a 48-item maximum and page numbers capped at 10,000. Search uses MongoDB text search and stable name and MongoDB `_id` ordering; category is an optional enum filter. Invalid queries return `400`, unpublished or missing slugs return `404`, and unexpected failures use the API's generic `500` handler. The safe seed command upserts only the 12 approved slugs. Seed version values stay null; `lastVerifiedAt` records the source-review date independently.
+
+The web app renders `/tools` and `/tools/[slug]` with Server Components, and provides matching same-origin BFF endpoints. Highlight.js runs on the server with an allowlist of supported languages; its escaped output is inserted as markup, and only the clipboard action uses client-side JavaScript.
+
 ## Related documents and decisions
 
 See [`prd.md`](prd.md), [`trd.md`](trd.md), [`appflow.md`](appflow.md), [`design-system.md`](design-system.md) and [`implementation-plan.md`](implementation-plan.md). Search indexes, admin provider, audit retention and production deployment are deferred until their implementation phases and evidence.

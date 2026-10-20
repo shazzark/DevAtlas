@@ -10,10 +10,11 @@ export class MissingMongoUriError extends Error {
   }
 }
 
-export async function checkMongoReadiness(uri: string | undefined): Promise<void> {
+export async function connectMongo(uri: string | undefined): Promise<void> {
   if (!uri) throw new MissingMongoUriError();
 
   if (mongoose.connection.readyState !== 1) {
+    // Share the in-flight first connection so concurrent requests do not race to open separate connections.
     connectionAttempt ??= mongoose.connect(uri, {
       bufferCommands: false,
       serverSelectionTimeoutMS: SERVER_SELECTION_TIMEOUT_MS,
@@ -23,7 +24,10 @@ export async function checkMongoReadiness(uri: string | undefined): Promise<void
     });
     await connectionAttempt;
   }
+}
 
+export async function checkMongoReadiness(uri: string | undefined): Promise<void> {
+  await connectMongo(uri);
   const database = mongoose.connection.db;
   if (!database) throw new Error("MongoDB connection is not ready");
   await database.admin().ping();

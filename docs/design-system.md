@@ -44,6 +44,10 @@ At mobile, tablet and desktop sizes, inspect home/shell, search, technology arti
 
 Phase 1.5 verification checks that Tailwind utilities compile in the relocated `apps/web` workspace, the sticky responsive navigation uses theme tokens, and the light/dark canvas color changes when the theme toggle changes `data-theme`. Custom global selectors remain only where they preserve shared browser behavior or bespoke illustration details.
 
+### Phase 2 catalog components
+
+Technology cards, filter controls, pagination, profile sections, related links, loading skeletons, empty states and service-error states use the existing semantic Tailwind color tokens and responsive spacing. Search and category filtering use labeled native form controls. The detail page keeps source links visible and marks unverified current versions explicitly. Code examples use server-side Highlight.js output inside a scrollable code surface; the copy button is the only client component for those examples and reports clipboard status to assistive technology. Keyboard and Playwright checks cover discovery, detail navigation, both themes and 375/768/1280px layouts.
+
 ## Related documents and approval
 
 See [`appflow.md`](appflow.md), [`prd.md`](prd.md) and [`trd.md`](trd.md). Product direction is approved in the PDF; detailed token values and component anatomy are reversible engineering decisions to refine during Phase 1.
