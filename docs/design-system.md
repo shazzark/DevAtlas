@@ -4,6 +4,8 @@
 
 **Status:** Approved direction; tokens are implementation proposals | **Design owner:** Product owner | **Platform:** Responsive web
 
+**Styling implementation:** Tailwind CSS v4.3.3 is the primary frontend styling system (verified as the current stable package on 20 October 2026). The official `@tailwindcss/postcss` plugin compiles utilities from `apps/web/postcss.config.mjs`; `apps/web/src/app/globals.css` imports Tailwind and maps semantic CSS variables through `@theme inline`. Component layout, spacing, responsive behavior and interaction states use utilities where they aid reuse. Global CSS keeps theme values, base/focus/reduced-motion behavior and the bespoke atlas illustration.
+
 ## Design goals and references
 
 - **[Confirmed]** Create an original, premium developer-focused experience with the quality and clarity associated with Linear, Vercel and Raycast.
@@ -13,7 +15,7 @@
 ## Foundations
 
 - **Color [Recommendation]:** Semantic CSS variables for canvas, surface, elevated surface, text, muted text, border, accent, success, warning and error; values should meet WCAG contrast targets in both themes.
-- **Themes [Confirmed]:** Light and dark themes. Persist preference locally; use system preference before an explicit choice. Avoid a flash of the wrong theme where possible.
+- **Themes [Confirmed]:** Light and dark themes. Persist preference locally; use system preference before an explicit choice. Tailwind semantic color utilities reference CSS variables that switch from `data-theme`; avoid a flash of the wrong theme where possible.
 - **Typography [Recommendation]:** Readable sans-serif for interface/body and a legible monospace for code. Use a limited responsive scale and comfortable article line lengths.
 - **Spacing/layout [Recommendation]:** Consistent spacing scale, responsive content width, clear section rhythm and persistent but compact navigation/search access.
 - **Motion [Recommendation]:** Small state transitions only; honor `prefers-reduced-motion`.
@@ -39,6 +41,8 @@
 ## Acceptance and comparison
 
 At mobile, tablet and desktop sizes, inspect home/shell, search, technology article, release article and guide layouts. Verify both themes, focus visibility, contrast, reduced motion, loading/empty/error states and no unintended horizontal overflow. No supplied Figma source exists; compare implementations against this written system, not a claim of pixel-matching external references.
+
+Phase 1.5 verification checks that Tailwind utilities compile in the relocated `apps/web` workspace, the sticky responsive navigation uses theme tokens, and the light/dark canvas color changes when the theme toggle changes `data-theme`. Custom global selectors remain only where they preserve shared browser behavior or bespoke illustration details.
 
 ## Related documents and approval
 

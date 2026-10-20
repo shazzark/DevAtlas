@@ -14,6 +14,8 @@
 4. **[Confirmed] Success:** Visitor opens a detail page with readable, structured content, official/source links, current verification metadata and related items.
 5. **[Confirmed] Continue:** Visitor follows a related technology, release explanation or guide, or copies a code sample.
 
+**Runtime path:** Public pages are rendered by Next.js. Server Components and BFF handlers call Fastify through a server-only typed client. Fastify validates requests and owns MongoDB reads/writes. The browser does not connect to Fastify or MongoDB directly.
+
 ## Primary editorial journey: verify and publish
 
 **User and goal:** An authorized editor turns a source-backed candidate into reviewed public content.
@@ -32,6 +34,7 @@
 | A catalog/feed has no published content | Helpful empty state; no fabricated records. | Use navigation to another available section. | [Recommendation] |
 | Content is loading | Accessible loading indication; no stale success claim. | Wait; retry if an error follows. | [Confirmed] |
 | Database unavailable | Explicit unavailable/error state; readiness endpoint reports not ready. | Retry later or restore database configuration. | [Recommendation] |
+| Fastify API unavailable | The web BFF returns a safe 503 response; public UI can still render its shell. | Restore the API service and retry the request. | [Confirmed] |
 | Content is not published | It does not appear in public results or detail routes. | Admin reviews and publishes it. | [Confirmed] |
 | Visitor copies code | Button reports copied or explains failure. | Select code manually if clipboard access is denied. | [Confirmed] |
 | Admin session missing/expired | Private route denies access and offers sign-in when configured. | Authenticate; do not render private content. | [Confirmed] |
@@ -46,3 +49,7 @@
 ## Related documents and approval
 
 See [`prd.md`](prd.md), [`trd.md`](trd.md), [`design-system.md`](design-system.md), [`backend-database-schema.md`](backend-database-schema.md) and [`implementation-plan.md`](implementation-plan.md). Flow is derived from the approved product PDF and explicit implementation requirements; details labeled recommendations are reversible engineering choices.
+
+### Phase 1.5 delivery update
+
+Frontend requests to Fastify use server-side BFF paths. `GET /api/health` proxies liveness and `GET /api/health/ready` proxies readiness while preserving the backend status. The API remains independently callable on its configured service origin. The UI has an explicit backend-unavailable response state.

@@ -13,7 +13,7 @@
 
 ## Milestones and dependencies
 
-Deliver vertical slices in the order below. Phase 1 creates the foundation; content phases add only their own models, APIs, UI and tests. Phase 6 depends on a selected secure admin identity mechanism. Phase 8 follows feature completion and covers production readiness. Release data is sourced and verified editorially; no credentials or verified release facts are assumed.
+Deliver vertical slices in the order below. Phase 1 establishes the product shell; Phase 1.5 separates frontend and backend before Phase 2 adds catalog content. Content phases continue to deliver models, API, UI and tests together across the app boundary. Phase 6 depends on a selected secure admin identity mechanism. Phase 8 follows feature completion and covers production readiness. Release data is sourced and verified editorially; no credentials or verified release facts are assumed.
 
 ## Phases
 
@@ -33,23 +33,35 @@ Deliver vertical slices in the order below. Phase 1 creates the foundation; cont
 ### Phase 1 - Foundation, database connection, shell and health
 
 - **Objective:** Establish a runnable full-stack base with truthful health/readiness behavior and usable responsive shell.
-- **Scope:** Next.js App Router/React/strict TypeScript/Tailwind/React Icons; shared modular boundaries; Mongoose connection lifecycle; `.env.example`; public app shell, responsive nav, search entry and light/dark theme; health and readiness routes; loading/error handling; baseline Vitest/Playwright configuration and tests.
+- **Scope:** Next.js App Router/React/strict TypeScript/Tailwind/React Icons; initial modular boundaries; Mongoose connection lifecycle; safe environment example; public app shell, responsive nav, search entry and light/dark theme; health and readiness behavior; loading/error handling; baseline Vitest/Playwright configuration and tests.
 - **Dependencies:** Node/npm environment; live DB check requires owner-provided URI but implementation can proceed without it.
-- **Deliverables:** App foundation, Mongo connection module, shell/theme, `/api/health` and `/api/health/ready`, setup docs.
+- **Deliverables:** Initial app foundation, database readiness behavior, shell/theme, `/api/health` and `/api/health/ready`, setup docs.
 - **Acceptance criteria:** App starts and builds; liveness reports app process without claiming database connectivity; readiness indicates DB unavailable when unconfigured and connected only after an actual successful DB check; shell works at mobile/desktop and both themes; keyboard navigation has visible focus; no credentials in source.
 - **Verification:** Strict typecheck, Vitest, production build, local endpoint checks, and available browser/responsive checks; report database verification limits.
 - **Risks/blockers:** Dependency installation/network access or no `MONGODB_URI`; continue with accurate degraded readiness and mock-free config tests.
 - **Completion conditions:** All checks available locally pass, docs reflect actual implementation, diff reviewed and local commit created.
-- **Observed completion:** Implemented the Next.js shell, Mongoose connection boundary, health/readiness endpoints, environment example, setup docs, Vitest and Playwright checks. Strict typecheck and production build passed; Vitest passed 4/4 tests; Playwright passed 5/5 tests with no database URI and again with an explicit local MongoDB URI; the real Mongoose readiness endpoint returned 200 against local MongoDB. No documents were written. Atlas credentials were not configured or used. Phase checkpoint is recorded in Git after final review.
+- **Observed completion:** The initial Next.js shell and health behavior passed the local typecheck/build, 4 Vitest tests and 5 Playwright checks; local MongoDB readiness returned 200 without writing documents. Phase 1.5 below moves database ownership and health routes to Fastify while preserving the verified shell/theme behavior.
+
+### Phase 1.5 - Separate frontend and backend
+
+- **Objective:** Preserve Phase 1 behavior while creating independently runnable and deployable web/API workspaces before feature content is added.
+- **Scope:** Move Next.js into `apps/web`; create Node.js/Fastify strict TypeScript backend in `apps/api`; move Mongoose and readiness ownership to the API; share only health/API Zod contracts through `packages/shared`; use server-only typed API client and Next.js BFF handlers; separate environment examples; orchestrate workspace development/build/test commands; retain Tailwind CSS v4 as the primary styling system and map the existing theme variables into Tailwind semantic tokens.
+- **Dependencies:** Existing npm project and package registry for Fastify/runtime dependencies; MongoDB Atlas is not required for process startup, but a dedicated local/test MongoDB URI enables live readiness integration verification.
+- **Deliverables:** Workspace monorepo, Fastify health/readiness API, Next.js BFF health routes, typed service client, separate web/API env examples, retained responsive shell and theme behavior, workspace documentation and tests.
+- **Acceptance criteria:** Web and API can run independently; the root development command starts both; MongoDB appears only under the API; API reports liveness without MongoDB and readiness only after an actual ping; the BFF reaches Fastify with parsed response contracts and safe failure responses; CORS is off because browser requests use the BFF; existing navigation/theme/mobile behavior is retained; Tailwind utility CSS compiles and theme utilities follow light/dark tokens.
+- **Verification:** Strict typecheck for all workspaces, unit/contract tests, Fastify inject integration, real MongoDB readiness ping against a dedicated local database when available, Playwright browser-to-BFF-to-Fastify path, responsive/theme checks and independent production builds for shared/API/web.
+- **Risks/blockers:** Local port conflicts and missing database URI; ports and API origin are configurable. Hosted multi-service networking and production origins are verified in the hosting phase.
+- **Completion conditions:** Architecture/security review has no unresolved material findings, all available checks pass, six planning docs describe actual architecture, and a local checkpoint is committed.
+- **Observed completion:** Tailwind CSS v4.3.3 is configured through the official PostCSS plugin in `apps/web`; utility classes drive the responsive shell and theme control, with existing design tokens and custom illustration styles retained. Strict workspace typecheck passed. Vitest passed 9/9 tests with the dedicated local MongoDB URI. Playwright passed 7/7 checks with MongoDB unavailable and 7/7 with readiness available, covering API/BFF communication, themes, keyboard navigation, and mobile/tablet/desktop overflow. Shared/API/web production builds passed. Architecture and security reviews reported no unresolved material findings. Local commit: to be recorded after final review.
 
 ### Phase 2 - Technology catalog
 
 - **Objective:** Browse and inspect the approved launch technology set.
-- **Scope:** Technology Mongoose model/indexes, repository/service/Zod/API, safe seed workflow, catalog/detail Server Components and search/filter entry, pagination, related technology links, states.
-- **Dependencies:** Phase 1; source evidence for version facts. Never seed invented current versions.
+- **Scope:** Technology Mongoose model/indexes, Fastify repository/service/Zod/API, safe seed workflow, Next.js catalog/detail Server Components and interactive search/filter entry, pagination, related technology links, states.
+- **Dependencies:** Phase 1.5; source evidence for stable content and version facts. Never seed invented current versions.
 - **Deliverables:** Technology APIs and responsive catalog/detail experience for up to 12 approved launch technologies.
 - **Acceptance criteria:** Validated CRUD/import workflow; public list/details expose published records only; slug uniqueness, pagination and empty/error states behave as specified.
-- **Verification:** Unit/API/database tests; responsive/keyboard browser checks when test environment permits.
+- **Verification:** Fastify service/contract/database integration tests; Next.js-to-API journey and responsive/keyboard browser checks.
 - **Risks/blockers:** Atlas credentials and verified source metadata; omit unverified version claims.
 - **Completion conditions:** End-to-end catalog slice works, docs/diff reviewed and phase committed.
 
@@ -125,4 +137,4 @@ Record scope changes and new decisions in the owning document and update accepta
 
 ## Approval and handoff
 
-The user approved the product PDF as the initial specification and authorized planning plus sequential local implementation. Phase 1 is the next implementation objective after this plan review. Local commits are authorized after completed, verified phases; pushing is not authorized.
+The user approved the product PDF as the initial specification, then approved Phase 1.5 before Phase 2 to split the applications. Local commits are authorized after completed, verified phases; pushing is not authorized. Phase 1.5 preserves the Phase 1 interface and inserts the API boundary before Phase 2. Phase 2 follows this refactor.

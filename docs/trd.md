@@ -6,7 +6,7 @@
 
 ## Scope and links
 
-Applies to the full-stack DevAtlas MVP in [`prd.md`](prd.md), beginning with the Phase 1 foundation in [`implementation-plan.md`](implementation-plan.md). This is a single Next.js application with backend and frontend delivered together in vertical slices.
+Applies to the full-stack DevAtlas MVP in [`prd.md`](prd.md). The frontend and backend are independently deployable npm workspaces, delivered together as vertical slices.
 
 ## Technical requirements
 
@@ -21,11 +21,18 @@ Applies to the full-stack DevAtlas MVP in [`prd.md`](prd.md), beginning with the
 | TR-07 | Public content endpoints return published material only. Administrative mutations require server-side authentication and authorization. | Editorial integrity and private administration. | Must; confirmed | Endpoint tests cover draft exclusion and unauthorized denial before admin launch. |
 | TR-08 | Release source data is traceable; unverified automated findings remain review drafts. Secrets are read only from server-side environment variables and never logged or committed. | Avoid false release claims and credential exposure. | Must; confirmed | Inspect data flow/configuration and test review gates; scan changed files for accidental secrets. |
 | TR-09 | Include `.env.example` with variable names and safe placeholders only. Missing optional database credentials must produce an explicit unavailable/degraded state, not a fake successful connection. | Setup clarity without fabricated credentials. | Must; confirmed | Configuration tests and readiness endpoint behavior with missing and valid test configuration. |
+| TR-10 | Run the frontend in `apps/web` with Next.js App Router, React, strict TypeScript and Tailwind CSS as the primary styling system. Keep React Icons for iconography. | The original frontend stack remains in place within the monorepo. | Must; confirmed | Tailwind utilities compile after relocation; theme, viewport, typecheck and production-build checks pass. |
+| TR-11 | Run the backend in `apps/api` as a Node.js/Fastify application with strict TypeScript, Zod validation and Mongoose. MongoDB access belongs only to this workspace. | Isolates persistence and backend business logic from presentation. | Must; confirmed | Repository search shows no Mongoose or `MONGODB_URI` access in the web app; API tests cover health and readiness. |
+| TR-12 | Use npm workspaces at the repository root. `packages/shared` may contain API contracts/types only; it must not contain secrets, environment access or server implementations. | Shared contracts should not couple deployable applications. | Must; confirmed | Root scripts build the shared package before dependent workspaces; verify imports and package contents. |
+| TR-13 | The web app uses a typed, server-only API client and Next.js BFF route handlers for backend calls. Keep `API_BASE_URL` server-side. Do not enable CORS unless a browser-to-Fastify path is introduced. | Avoids exposing API routing configuration and database services to browser code. | Must; confirmed | Frontend health BFF reaches Fastify; response contracts are parsed by shared Zod schemas; no public client secret. |
+| TR-14 | Use Tailwind CSS v4.3.3 with the official `@tailwindcss/postcss` PostCSS integration. Map design-system theme variables into Tailwind tokens; retain global CSS for theme values, base rules and bespoke artwork. | Tailwind is the primary styling system while preserving the established DevAtlas design. | Must; confirmed | Verify utility styles at runtime, light/dark computed colors, mobile/desktop reflow and production CSS output. |
 
 ## Constraints
 
 - [Confirmed] MongoDB Atlas + Mongoose is the primary and only database. Do not introduce PostgreSQL or another primary store.
-- [Confirmed] Use App Router and a modular monolith within Next.js; API route handlers are the HTTP boundary.
+- [Confirmed] Use separate web and API apps in a modular monorepo. Fastify route handlers are the backend HTTP boundary; Next.js handlers are narrow BFF proxies.
+- [Confirmed] Only `apps/api` may connect to MongoDB. Shared packages stay framework-light and credential-free.
+- [Confirmed] Tailwind CSS is the primary component styling system. Global CSS retains paired theme variables, base rules and the original atlas artwork.
 - [Confirmed] No external release feed, registry, analytics provider, authentication service or cloud account is presumed available.
 - [Recommendation] Keep public shell/liveness usable without a configured database; readiness reports database status honestly. Database-backed pages must show a clear unavailable state when disconnected.
 - [Recommendation] Avoid a background queue, search service, cache or paid provider until a demonstrated need exists.
@@ -35,6 +42,8 @@ Applies to the full-stack DevAtlas MVP in [`prd.md`](prd.md), beginning with the
 | Dependency | Purpose | Access/credential status | Fallback |
 |---|---|---|---|
 | MongoDB Atlas | Persistent content and readiness checks | `MONGODB_URI` must be supplied by project owner for live Atlas use; none is assumed here. | Local shell and unit tests can run; DB-backed behavior remains unverified until an isolated database is available. |
+| Fastify backend | Internal API and MongoDB boundary | `HOST`, `PORT`, `LOG_LEVEL`; database access uses `MONGODB_URI` in `apps/api`. | Backend liveness runs without a database; readiness returns 503 until MongoDB responds. |
+| Next.js web app | Public presentation and server-side BFF | `API_BASE_URL` in `apps/web`; no database URI in this workspace. | UI shell can render while the backend is unavailable and displays a safe BFF error for backend calls. |
 | Official technology documentation and release sources | Traceable editorial content | Public sources can be researched individually; no API credential or feed access is assumed. | Manual source links and editorial review; no fabricated release data. |
 | Admin identity mechanism | Secure private content management | Provider and credentials not selected; resolve before Phase 6. | No admin publishing until selected and configured. |
 | Hosting platform | Production deployment | Not selected. | Local development continues; deployment preparation remains Phase 8. |
@@ -45,6 +54,8 @@ Applies to the full-stack DevAtlas MVP in [`prd.md`](prd.md), beginning with the
 - Important database behavior is verified against an isolated test database when access exists; unavailable database integration is reported explicitly.
 - Browser checks cover key public journeys, keyboard interaction, loading/empty/error states and responsive reflow. Do not claim visual fidelity or accessibility conformance without the corresponding checks.
 - Error responses do not expose credentials, stack traces or internal database details.
+- Frontend-to-backend calls run server-side, use bounded timeouts and validate response contracts; direct browser CORS is not enabled.
+- Tailwind utility classes compile and respond to theme tokens after the frontend is moved under `apps/web`.
 - Release publication and admin authorization tests verify denial paths as well as success paths.
 
 ## Open technical decisions

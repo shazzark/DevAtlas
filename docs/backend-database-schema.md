@@ -6,23 +6,27 @@
 
 ## System boundaries and module ownership
 
-**[Confirmed]** One modular Next.js App Router application serves the web UI and internal API. Keep it a modular monolith until an observed requirement justifies separate processes.
+**[Confirmed]** A small npm-workspaces monorepo contains independently runnable web and API applications. The browser uses the Next.js web app; server-side BFF routes call Fastify. Fastify alone owns Mongoose and MongoDB access. A future source-monitoring worker can be a separate process/workspace if its lifecycle or scaling needs justify one; no queue or worker infrastructure is introduced yet.
 
 ```text
 Browser
-  +-- Server Components / interactive Client Components
-  +-- App Router API handlers (HTTP parsing, status and response)
-       +-- Zod validation -> feature service -> feature repository (Mongoose)
-                                               +-- MongoDB Atlas
+  +-- Next.js App Router (Server Components / interactive Client Components)
+       +-- server-only typed API client / BFF handlers
+            +-- Fastify routes -> Zod -> feature services -> repositories (Mongoose)
+                                                        +-- MongoDB Atlas
+
+packages/shared: Zod request/response contracts and TypeScript types only
 ```
 
-- **HTTP handlers:** Parse and validate requests, invoke one use case and map stable errors/status codes; do not contain persistence or editorial policy.
+- **Fastify API (`apps/api`):** Owns health/readiness, request validation, services, repositories and database connections. Route handlers map requests to stable response/status contracts.
+- **Next.js web (`apps/web`):** Owns page rendering, navigation and presentation. Narrow Route Handlers proxy typed backend calls from the server. Do not access Mongoose, `MONGODB_URI` or MongoDB from this workspace.
+- **Shared package (`packages/shared`):** Owns contracts shared across workspace boundaries. It has no environment reads, credentials, database package or server-only implementation.
 - **Feature services:** Enforce content lifecycle and use cases without depending on Next.js request/response objects.
-- **Repositories:** Own Mongoose queries and persistence for their feature; avoid a generic repository abstraction unless it expresses real shared behavior.
-- **Validation:** Zod schemas validate untrusted route and admin input at the boundary.
+- **Repositories:** Located in the backend and own Mongoose queries for their feature; avoid generic CRUD abstractions that hide query intent.
+- **Validation:** Zod schemas validate untrusted API input at the Fastify boundary; shared response schemas validate backend responses consumed by the web app.
 - **Authentication/authorization:** Server-side admin identity and action checks; provider choice remains open until Phase 6.
 - **Content processing:** Official source ingestion/detection can produce review drafts. It cannot publish. External content is untrusted input.
-- **UI:** Server Components load public content; Client Components are reserved for interaction such as theme control, search controls and copy buttons.
+- **UI:** Server Components load public content through the server-only API client; Client Components are reserved for interaction such as theme control, search controls and copy buttons. Tailwind CSS is the primary styling system; theme variables are exposed as semantic utilities.
 
 ## Data concepts and ownership
 
@@ -53,6 +57,13 @@ Browser
 ## Acceptance and verification
 
 Introduce schemas and indexes alongside each vertical slice. Verify schema validation and uniqueness against an isolated database when available; test services with focused unit tests and route behavior at HTTP boundaries. Verify public queries exclude draft/review content. Never run destructive operations against production during development.
+
+### Implemented Phase 1.5 boundary
+
+- Fastify owns `GET /api/health` and `GET /api/health/ready`. Readiness connects through Mongoose and pings MongoDB; its public error response is generic and does not include driver details.
+- Next.js BFF handlers expose same-path health calls to the web origin and use a server-only typed client with a four-second request timeout. No browser-to-Fastify CORS path is required or enabled.
+- Backend environment is isolated in `apps/api` (`MONGODB_URI`, `PHASE15_MONGODB_TEST_URI`, `HOST`, `PORT`, `LOG_LEVEL`). Web environment uses server-only `API_BASE_URL` in `apps/web`.
+- `packages/shared` publishes compiled health response schemas/types. Root scripts build it before API/web builds and local development.
 
 ## Related documents and decisions
 

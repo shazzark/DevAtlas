@@ -21,7 +21,7 @@ Developers currently piece together technology explanations, release information
 
 ### PR-01 Technology Explorer
 
-- **Requirement:** [Confirmed] Present a catalog of 12 launch technologies: JavaScript, TypeScript, React, Next.js, Node.js, Express, PostgreSQL, MongoDB, Git, Docker, Vitest and Socket.IO. Each page explains purpose, use cases, when not to use, setup, key concepts, examples, related tools, official sources, current version and verification dates.
+- **Requirement:** [Confirmed] Present a catalog of 12 launch technologies: JavaScript, TypeScript, React, Next.js, Node.js, Express, PostgreSQL, MongoDB, Git, Docker, Vitest and Socket.IO. Each page explains purpose, use cases, when not to use, setup, key concepts, examples, related tools, official sources, current version when verified, and content verification dates.
 - **Priority/status:** Must have; approved baseline.
 - **Acceptance criteria:** A visitor can find and open each published technology page; each page exposes its required sections and source links; absent or stale version facts are labeled unavailable or not verified rather than fabricated.
 - **Related journey/dependency:** Catalog and detail flows in `appflow.md`; Phase 2.
@@ -85,3 +85,7 @@ Developers currently piece together technology explanations, release information
 ## Approval and change history
 
 The product owner approved the PDF as the initial specification on 20 October 2026. The user authorized planning and sequential MVP implementation in this request. Changes that materially alter this scope must be recorded here and in the implementation plan.
+
+## Delivery architecture update
+
+The user approved a separate frontend and backend before Phase 2: `apps/web` renders the product with Next.js and Tailwind CSS; `apps/api` owns backend logic and MongoDB through Fastify and Mongoose; `packages/shared` contains only reusable API contracts. This changes delivery boundaries, not the product scope above. The browser continues to use the web application; Next.js makes server-side requests to Fastify.
