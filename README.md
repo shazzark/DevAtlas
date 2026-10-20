@@ -44,7 +44,7 @@ Tailwind CSS v4 is the primary web styling system, with the existing CSS variabl
 
 ## Environment variables
 
-`apps/api/.env.example`: `MONGODB_URI` (development Atlas URI), `PHASE15_MONGODB_TEST_URI`, `PHASE2_MONGODB_TEST_URI`, `HOST`, `PORT`, and `LOG_LEVEL`. The example documents the URI shape without containing credentials. Keep the actual value in the ignored `apps/api/.env` file or a secret manager.
+`apps/api/.env.example`: `MONGODB_URI` (preferred development Atlas URI; `DATABASE_URL` is accepted as a compatibility alias), `PHASE15_MONGODB_TEST_URI`, `PHASE2_MONGODB_TEST_URI`, `HOST`, `PORT`, and `LOG_LEVEL`. The example documents the URI shape without containing credentials. Keep the actual value in the ignored `apps/api/.env` file or a secret manager. If both URI variables are set, they must match.
 
 `apps/web/.env.example`: server-only `API_BASE_URL`.
 

@@ -16,6 +16,18 @@ describe("API environment configuration", () => {
     expect(config.mongoUri).toBe("mongodb://127.0.0.1:27017/devatlas_test");
   });
 
+  it("accepts an Atlas URI configured with DATABASE_URL", () => {
+    const config = parseEnvironment({ DATABASE_URL: "mongodb+srv://test-user:test-password@cluster.example.mongodb.net/devatlas_test" });
+    expect(config.mongoUri).toBe("mongodb+srv://test-user:test-password@cluster.example.mongodb.net/devatlas_test");
+  });
+
+  it("rejects conflicting MongoDB URI environment variables", () => {
+    expect(() => parseEnvironment({
+      MONGODB_URI: "mongodb://127.0.0.1:27017/devatlas_test",
+      DATABASE_URL: "mongodb+srv://test-user:test-password@cluster.example.mongodb.net/devatlas_test",
+    })).toThrow("MONGODB_URI");
+  });
+
   it("rejects an invalid port and reports only the variable name", () => {
     expect(() => parseEnvironment({ PORT: "70000" })).toThrow("PORT");
   });
