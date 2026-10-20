@@ -28,6 +28,7 @@ Deliver vertical slices in the order below. Phase 1 creates the foundation; cont
 - **Planning method:** The installed `project-planning` skill was invoked and its document templates followed for the six documents requested. The installed skill catalogs did not contain a separately named six-document skill; no such skill is claimed.
 - **Risks/blockers:** A separately named six-document skill was not available in the installed catalogs. The six requested documents were produced with the installed planning skill's conventions.
 - **Completion conditions:** Six documents reviewed and Phase 1 implementation is ready under the user's authorization.
+- **Observed completion:** The PDF was extracted and its product decisions recorded in the PRD. The six documents were reviewed for consistency and committed as `a802ee1`.
 
 ### Phase 1 - Foundation, database connection, shell and health
 
@@ -39,6 +40,7 @@ Deliver vertical slices in the order below. Phase 1 creates the foundation; cont
 - **Verification:** Strict typecheck, Vitest, production build, local endpoint checks, and available browser/responsive checks; report database verification limits.
 - **Risks/blockers:** Dependency installation/network access or no `MONGODB_URI`; continue with accurate degraded readiness and mock-free config tests.
 - **Completion conditions:** All checks available locally pass, docs reflect actual implementation, diff reviewed and local commit created.
+- **Observed completion:** Implemented the Next.js shell, Mongoose connection boundary, health/readiness endpoints, environment example, setup docs, Vitest and Playwright checks. Strict typecheck and production build passed; Vitest passed 4/4 tests; Playwright passed 5/5 tests with no database URI and again with an explicit local MongoDB URI; the real Mongoose readiness endpoint returned 200 against local MongoDB. No documents were written. Atlas credentials were not configured or used. Phase checkpoint is recorded in Git after final review.
 
 ### Phase 2 - Technology catalog
 
