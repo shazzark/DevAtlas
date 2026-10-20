@@ -4,7 +4,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 
 const navigation = [
   { href: "/tools", label: "Explore", icon: FiLayers },
-  { href: "/#whats-new", label: "What’s new", icon: FiZap },
+  { href: "/whats-new", label: "What’s new", icon: FiZap },
   { href: "/#guides", label: "Guides", icon: FiBookOpen },
 ];
 
@@ -18,7 +18,7 @@ export function SiteHeader() {
         </Link>
 
         <nav aria-label="Main navigation" className="ml-auto mr-6 flex gap-8 max-[900px]:gap-[19px] max-[680px]:hidden">
-          {navigation.map(({ href, label }) => <a className="text-[13px] font-medium text-text-soft transition-colors hover:text-text" href={href} key={href}>{label}</a>)}
+          {navigation.map(({ href, label }) => <Link className="text-[13px] font-medium text-text-soft transition-colors hover:text-text" href={href} key={href}>{label}</Link>)}
         </nav>
 
         <div className="flex items-center gap-4 max-[680px]:gap-1">

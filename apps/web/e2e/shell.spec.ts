@@ -19,8 +19,8 @@ test("home page shows its core message and reviewed-release empty state", async 
     .getByRole("navigation", { name: "Main navigation" })
     .getByRole("link", { name: /new/i })
     .click();
-  await expect(page).toHaveURL(/#whats-new$/);
-  await expect(page.locator("#whats-new")).toBeVisible();
+  await expect(page).toHaveURL(/\/whats-new$/);
+  await expect(page.getByRole("heading", { name: "What’s new" })).toBeVisible();
 });
 
 test("theme toggle changes the document theme", async ({ page }) => {

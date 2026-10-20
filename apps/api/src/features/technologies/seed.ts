@@ -1,6 +1,10 @@
-import "dotenv/config";
+import { config as loadDotEnv } from "dotenv";
+import { fileURLToPath } from "node:url";
 import mongoose from "mongoose";
+import { parseEnvironment } from "../../config.js";
 import { TechnologyModel } from "./model.js";
+
+loadDotEnv({ path: fileURLToPath(new URL("../../../.env", import.meta.url)) });
 
 const verifiedAt = new Date("2026-10-20T00:00:00.000Z");
 const entries = [
@@ -37,11 +41,11 @@ const entries = [
   version: { current: null, releasedAt: null, sourceUrl: null, lastVerifiedAt: verifiedAt }, status: "published",
 }));
 
-const mongoUri = process.env.MONGODB_URI;
-if (!mongoUri) throw new Error("MONGODB_URI is required to seed technologies");
+const mongoUri = parseEnvironment(process.env).mongoUri;
+if (!mongoUri) throw new Error("MONGODB_URI or DATABASE_URL is required to seed technologies");
 await mongoose.connect(mongoUri);
 try {
-  // Upsert only the approved seed slugs so repeated runs update these records without clearing other content.
-  await Promise.all(entries.map((entry) => TechnologyModel.updateOne({ slug: entry.slug }, { $set: entry }, { upsert: true, runValidators: true })));
-  console.log(`Upserted ${entries.length} technology records.`);
+  // Populate only missing approved records so the initial seed never overwrites existing editorial changes.
+  await Promise.all(entries.map((entry) => TechnologyModel.updateOne({ slug: entry.slug }, { $setOnInsert: entry }, { upsert: true, runValidators: true })));
+  console.log(`Ensured ${entries.length} approved technology records without overwriting existing entries.`);
 } finally { await mongoose.disconnect(); }

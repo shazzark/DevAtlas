@@ -8,6 +8,7 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/server.js",
     "seed:technologies": "npm run build && node dist/features/technologies/seed.js",
+    "monitor:releases": "npm run build && node dist/features/releases/monitor-command.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },

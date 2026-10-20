@@ -48,6 +48,10 @@ Phase 1.5 verification checks that Tailwind utilities compile in the relocated `
 
 Technology cards, filter controls, pagination, profile sections, related links, loading skeletons, empty states and service-error states use the existing semantic Tailwind color tokens and responsive spacing. Search and category filtering use labeled native form controls. The detail page keeps source links visible and marks unverified current versions explicitly. Code examples use server-side Highlight.js output inside a scrollable code surface; the copy button is the only client component for those examples and reports clipboard status to assistive technology. Keyboard and Playwright checks cover discovery, detail navigation, both themes and 375/768/1280px layouts.
 
+### Phase 3 release components
+
+The What's New feed uses source-attributed release cards and filters; release detail pages distinguish source metadata from editorial explanations and show verification date and source links. Empty feed, API failure, invalid filter, loading and not-found states use the catalog's semantic tokens and accessible headings/statuses. Code examples keep the shared syntax-highlighted surface and copy status. The Playwright suite checks release recovery, themes, keyboard navigation and mobile overflow at 375px; all 15 end-to-end tests passed against the production web build and live Fastify service.
+
 ## Related documents and approval
 
 See [`appflow.md`](appflow.md), [`prd.md`](prd.md) and [`trd.md`](trd.md). Product direction is approved in the PDF; detailed token values and component anatomy are reversible engineering decisions to refine during Phase 1.

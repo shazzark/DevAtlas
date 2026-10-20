@@ -17,7 +17,7 @@ export default function HomePage() {
           <p className="hero-intro">A calmer way to keep up with the technologies behind your work — what they do, what changed, and how they fit together.</p>
           <div className="hero-actions">
             <a className="button button-primary" href="/tools">Explore the atlas <FiArrowRight aria-hidden="true" /></a>
-            <a className="text-link" href="#whats-new">See what’s new <FiArrowDownRight aria-hidden="true" /></a>
+            <Link className="text-link" href="/whats-new">See what’s new <FiArrowDownRight aria-hidden="true" /></Link>
           </div>
           <form action="/tools" className="search-entry" id="search" role="search">
             <label className="sr-only" htmlFor="home-search">Search technologies</label><FiSearch aria-hidden="true" />
@@ -63,6 +63,7 @@ export default function HomePage() {
             <span className="empty-kicker">What’s new</span>
             <p>There are no reviewed releases to show yet.</p>
             <small>Release updates will include links to their official sources.</small>
+            <Link className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-accent-strong underline underline-offset-4" href="/whats-new">Browse release updates <FiArrowRight aria-hidden="true" /></Link>
           </div>
         </div>
       </section>

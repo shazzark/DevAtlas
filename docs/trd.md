@@ -27,7 +27,8 @@ Applies to the full-stack DevAtlas MVP in [`prd.md`](prd.md). The frontend and b
 | TR-13 | The web app uses a typed, server-only API client and Next.js BFF route handlers for backend calls. Keep `API_BASE_URL` server-side. Do not enable CORS unless a browser-to-Fastify path is introduced. | Avoids exposing API routing configuration and database services to browser code. | Must; confirmed | Frontend health BFF reaches Fastify; response contracts are parsed by shared Zod schemas; no public client secret. |
 | TR-14 | Use Tailwind CSS v4.3.3 with the official `@tailwindcss/postcss` PostCSS integration. Map design-system theme variables into Tailwind tokens; retain global CSS for theme values, base rules and bespoke artwork. | Tailwind is the primary styling system while preserving the established DevAtlas design. | Must; confirmed | Verify utility styles at runtime, light/dark computed colors, mobile/desktop reflow and production CSS output. |
 | TR-15 | Technology catalog APIs validate search/category/pagination inputs, expose published records only and return stable list/detail contracts. | Supports useful discovery without leaking draft content. | Must; Phase 2 | Fastify inject and MongoDB tests cover filters, paging, drafts, invalid input and missing slugs. |
-| TR-16 | Technology version metadata is nullable and separate from editorial `lastVerifiedAt`; never populate a current version or release date without official verification. | Avoids presenting stale or invented release data as current. | Must; confirmed | Inspect seed records and detail page labels; verify version fields remain null when unchecked. |
+| TR-16 | Release monitoring reads only fixed official HTTPS endpoints, bounds time/response size, rejects redirects and validates upstream payloads. Detection creates draft candidates only; published APIs return reviewed records only. | Provides traceability while keeping unverified summaries out of public content. | Must; Phase 3 | Fixture tests cover adapter filtering and failures; Mongo/API tests cover idempotency, auth denial, lifecycle and published-only reads. |
+| TR-17 | Technology version metadata is nullable and separate from editorial `lastVerifiedAt`; never populate a current version or release date without official verification. | Avoids presenting stale or invented release data as current. | Must; confirmed | Inspect seed records and detail page labels; verify version fields remain null when unchecked. |
 
 ## Constraints
 
@@ -46,10 +47,11 @@ Applies to the full-stack DevAtlas MVP in [`prd.md`](prd.md). The frontend and b
 | Dependency | Purpose | Access/credential status | Fallback |
 |---|---|---|---|
 | MongoDB Atlas | Persistent content and readiness checks | `MONGODB_URI` must be supplied by project owner for live Atlas use; none is assumed here. | Local shell and unit tests can run; DB-backed behavior remains unverified until an isolated database is available. |
-| Fastify backend | Internal API and MongoDB boundary | `HOST`, `PORT`, `LOG_LEVEL`; database access uses `MONGODB_URI` in `apps/api`. | Backend liveness runs without a database; readiness returns 503 until MongoDB responds. |
+| Fastify backend | Internal API and MongoDB boundary | `HOST`, `PORT`, `LOG_LEVEL`; database access uses `MONGODB_URI` (preferred) or matching `DATABASE_URL` compatibility alias in `apps/api`. | Backend liveness runs without a database; readiness returns 503 until MongoDB responds. |
 | Next.js web app | Public presentation and server-side BFF | `API_BASE_URL` in `apps/web`; no database URI in this workspace. | UI shell can render while the backend is unavailable and displays a safe BFF error for backend calls. |
 | Official technology documentation and release sources | Traceable editorial content | Public sources can be researched individually; no API credential or feed access is assumed. | Manual source links and editorial review; no fabricated release data. |
 | Highlight.js | Server-side syntax highlighting for stored technology examples | Package dependency; no credential or network call at runtime. | Unsupported language identifiers render as escaped plain text. |
+| Official release metadata (npm registry, Node.js dist index, GitHub Moby releases) | Detect source-backed release candidates | Public HTTPS reads; no credential or paid API required. GitHub requests use its unauthenticated quota and honor ETag/rate-limit responses. | Manual official-source review; a failed check is reported and never treated as no releases. |
 | Admin identity mechanism | Secure private content management | Provider and credentials not selected; resolve before Phase 6. | No admin publishing until selected and configured. |
 | Hosting platform | Production deployment | Not selected. | Local development continues; deployment preparation remains Phase 8. |
 
@@ -62,6 +64,10 @@ Applies to the full-stack DevAtlas MVP in [`prd.md`](prd.md). The frontend and b
 - Frontend-to-backend calls run server-side, use bounded timeouts and validate response contracts; direct browser CORS is not enabled.
 - Tailwind utility classes compile and respond to theme tokens after the frontend is moved under `apps/web`.
 - Release publication and admin authorization tests verify denial paths as well as success paths.
+
+### Phase 3 release processing
+
+`apps/api/src/features/releases` stores `releases` and `release_sources`. Source definitions are a fixed allowlist; the monitor polls sequentially with timeout, redirect rejection, a response-size cap, payload validation and ETag support. It reports per-source failures, upserts by stable source identity, and never generates editorial summaries. `lastCheckedAt` tracks attempts; incremental adapters use `lastSuccessfulAt`, which advances only after a complete successful fetch and candidate write, preventing outages from skipping releases. Public release queries filter to `published`. Review-queue, monitor HTTP and review-decision routes require an injected authorizer; without Phase 6 auth they return `503` fail-closed. A backend command is available for controlled source checks. No browser or shared package reads MongoDB.
 
 ## Open technical decisions
 

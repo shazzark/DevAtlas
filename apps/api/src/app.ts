@@ -4,12 +4,18 @@ import { closeMongoConnection, checkMongoReadiness, connectMongo } from "./infra
 import { registerHealthRoutes, type ReadinessCheck } from "./features/health/routes.js";
 import { registerTechnologyRoutes } from "./features/technologies/routes.js";
 import type { TechnologyService } from "./features/technologies/service.js";
+import { registerReleaseRoutes, type ReleaseReviewAuthorizer } from "./features/releases/routes.js";
+import { ReleaseService } from "./features/releases/service.js";
+import { ReleaseMonitorService } from "./features/releases/monitor-service.js";
 
 export type AppDependencies = {
   checkDatabase?: ReadinessCheck;
   closeDatabase?: () => Promise<void>;
   connectDatabase?: () => Promise<void>;
   technologyService?: TechnologyService;
+  releaseService?: ReleaseService;
+  releaseMonitor?: ReleaseMonitorService;
+  authorizeReleaseReview?: ReleaseReviewAuthorizer;
 };
 
 export function buildApp(config: ApiConfig, dependencies: AppDependencies = {}): FastifyInstance {
@@ -25,6 +31,11 @@ export function buildApp(config: ApiConfig, dependencies: AppDependencies = {}):
   const checkDatabase = dependencies.checkDatabase ?? (() => checkMongoReadiness(config.mongoUri));
   registerHealthRoutes(app, checkDatabase);
   registerTechnologyRoutes(app, dependencies.technologyService, dependencies.connectDatabase ?? (() => connectMongo(config.mongoUri)));
+  registerReleaseRoutes(app, {
+    service: dependencies.releaseService ?? new ReleaseService(),
+    monitor: dependencies.releaseMonitor ?? new ReleaseMonitorService(),
+    authorizeReview: dependencies.authorizeReleaseReview,
+  });
   app.addHook("onClose", async () => {
     await (dependencies.closeDatabase ?? closeMongoConnection)();
   });

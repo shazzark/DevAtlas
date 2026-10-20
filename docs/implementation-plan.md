@@ -69,13 +69,14 @@ Deliver vertical slices in the order below. Phase 1 establishes the product shel
 ### Phase 3 - Release intelligence
 
 - **Objective:** Publish traceable, reviewed release explanations.
-- **Scope:** Release model/source records/indexes; source-monitor adapter design and only verified official-source integrations; candidate draft workflow; review service/API; What's New and release detail pages.
+- **Scope:** Release model/source records/indexes; fixed official-source adapters; idempotent candidate draft workflow; review service/API (fail-closed until Phase 6 auth); What's New and release detail pages.
 - **Dependencies:** Phase 2 technology references; confirmed source access and editorial checks.
-- **Deliverables:** Extensible official-source detection and human review, breaking/migration/upgrade sections and timestamps.
+- **Deliverables:** Extensible official-source detection and human review, breaking/migration/upgrade sections and timestamps; `releases` and `release_sources` collections; typed shared contracts; web BFF paths.
 - **Acceptance criteria:** Detection only creates drafts; public views require publication and show source/applicability/verification; API failures never masquerade as release detections.
-- **Verification:** Fixture-based source processing, API denial/lifecycle tests, editorial workflow browser checks.
-- **Risks/blockers:** Official API/feed limits or access; use public official pages and manual process if automated access is unavailable.
-- **Completion conditions:** End-to-end reviewed release flow and phase commit; dependencies and credentials reported.
+- **Verification:** Source-adapter fixtures; API auth-denial/lifecycle tests; isolated Mongo integration; full Playwright journey; strict typecheck and production builds.
+- **Risks/blockers:** Public source rate limits or access; use manual verification where no official machine endpoint exists. Admin identity remains a Phase 6 dependency; network review routes stay unavailable until authorization is configured.
+- **Completion conditions:** End-to-end detection to draft and public published-only paths work; docs/review complete and local commit created; external dependencies and credentials reported.
+- **Observed completion:** Implemented 12 official-source definitions (8 polled, 4 manual), safe sequential adapters for npm registry latest metadata, Node.js distribution metadata and Docker Engine tags from the official Moby releases endpoint. The initial live Atlas scan checked all 8 polled sources, found 20 candidates and inserted them as drafts only. Atlas uses `devatlas`; the insert-only technology seed added the approved 12 catalog records without overwriting existing content. A second scan after the successful-watermark fix checked all 8 sources, discovered 6 already-known items and inserted 0 duplicates. Fastify offers published-only `GET /api/releases` and `GET /api/releases/:slug`, protected review queue/monitor/review routes, and a backend monitor command. Review routes fail closed until Phase 6 supplies authorization. Read-only review prompted separating attempted and successful scan timestamps so an outage cannot advance the incremental cutoff; a unit regression and MongoDB integration assertion pass. Final checks passed: strict workspace typecheck; `npm test` (38 passed, including isolated MongoDB integration coverage); `npm run build`; Playwright (15/15); Atlas readiness returned `ready`. No credentials or paid services are required for public source reads; Atlas remains configured by the owner. Local checkpoint commit created after verification.
 
 ### Phase 4 - Stack guides
 

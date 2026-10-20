@@ -1,7 +1,8 @@
 import "server-only";
 import {
-  healthResponseSchema, readinessResponseSchema, technologyDetailResponseSchema, technologyListResponseSchema,
+  healthResponseSchema, readinessResponseSchema, releaseDetailResponseSchema, releaseListResponseSchema, technologyDetailResponseSchema, technologyListResponseSchema,
   type HealthResponse, type ReadinessResponse, type TechnologyListQuery, type Technology,
+  type ReleaseListQuery, type Release,
 } from "@devatlas/shared";
 
 const DEFAULT_API_BASE_URL = "http://127.0.0.1:4001";
@@ -31,7 +32,7 @@ async function get<T>(path: string, parse: (body: unknown) => T): Promise<{ stat
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   const body: unknown = await response.json();
-  if (path.startsWith("/api/technologies") && !response.ok) throw new ApiClientError(response.status, body);
+  if ((path.startsWith("/api/technologies") || path.startsWith("/api/releases")) && !response.ok) throw new ApiClientError(response.status, body);
   return { status: response.status, data: parse(body) };
 }
 
@@ -52,5 +53,16 @@ export const apiClient = {
   },
   async getTechnology(slug: string): Promise<{ status: number; data: { item: Technology } }> {
     return get(`/api/technologies/${encodeURIComponent(slug)}`, (body) => technologyDetailResponseSchema.parse(body));
+  },
+  async listReleases(query: Partial<ReleaseListQuery> = {}) {
+    const params = new URLSearchParams();
+    for (const key of ["technologySlug", "page", "limit"] as const) {
+      const value = query[key];
+      if (value !== undefined && value !== "") params.set(key, String(value));
+    }
+    return get(`/api/releases${params.size ? `?${params}` : ""}`, (body) => releaseListResponseSchema.parse(body));
+  },
+  async getRelease(slug: string): Promise<{ status: number; data: { item: Release } }> {
+    return get(`/api/releases/${encodeURIComponent(slug)}`, (body) => releaseDetailResponseSchema.parse(body));
   },
 };

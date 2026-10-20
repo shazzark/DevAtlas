@@ -62,7 +62,7 @@ Introduce schemas and indexes alongside each vertical slice. Verify schema valid
 
 - Fastify owns `GET /api/health` and `GET /api/health/ready`. Readiness connects through Mongoose and pings MongoDB; its public error response is generic and does not include driver details.
 - Next.js BFF handlers expose same-path health calls to the web origin and use a server-only typed client with a four-second request timeout. No browser-to-Fastify CORS path is required or enabled.
-- Backend environment is isolated in `apps/api` (`MONGODB_URI`, `PHASE15_MONGODB_TEST_URI`, `HOST`, `PORT`, `LOG_LEVEL`). Web environment uses server-only `API_BASE_URL` in `apps/web`.
+- Backend environment is isolated in `apps/api` (`MONGODB_URI`, compatible `DATABASE_URL`, per-phase test URIs, `HOST`, `PORT`, `LOG_LEVEL`). Web environment uses server-only `API_BASE_URL` in `apps/web`.
 - `packages/shared` publishes compiled health response schemas/types. Root scripts build it before API/web builds and local development.
 
 ### Implemented Phase 2 Technology module
@@ -72,6 +72,12 @@ Introduce schemas and indexes alongside each vertical slice. Verify schema valid
 Shared Zod contracts define the query and response shapes. `GET /api/technologies?q=&category=&page=&limit=` returns `{items, pagination, categories}`; `GET /api/technologies/:slug` returns `{item}`. The list defaults to page 1 and 12 items, with a 48-item maximum and page numbers capped at 10,000. Search uses MongoDB text search and stable name and MongoDB `_id` ordering; category is an optional enum filter. Invalid queries return `400`, unpublished or missing slugs return `404`, and unexpected failures use the API's generic `500` handler. The safe seed command upserts only the 12 approved slugs. Seed version values stay null; `lastVerifiedAt` records the source-review date independently.
 
 The web app renders `/tools` and `/tools/[slug]` with Server Components, and provides matching same-origin BFF endpoints. Highlight.js runs on the server with an allowlist of supported languages; its escaped output is inserted as markup, and only the clipboard action uses client-side JavaScript.
+
+### Implemented Phase 3 Release module
+
+`releases` stores technology reference/slug, version and stable source identity, source title/URL/publication metadata, untrusted source excerpt, last detection time, editorial breakdown, `draft|review|published` status, and verification/review/publication attribution timestamps. Indexes: unique slug; unique `{sourceKey, sourceReleaseId}`; published feed `{status, sourcePublishedAt, _id}`; per-technology feed `{status, technologySlug, sourcePublishedAt, _id}`; review queue `{status, updatedAt}`. `release_sources` stores one source per unique `sourceKey`, its technology, fixed source kind/official URL, enablement, ETag, last-check time and safe status/error code; an `{enabled, kind}` index supports monitoring.
+
+Release lists default to page 1 and 12 items, limit 48, optionally filter by `technologySlug`, and return `{items, pagination}`. Public detail returns `{item}`. `GET /api/admin/releases/candidates` returns `{items}`; `POST /api/admin/releases/monitor` returns the source report; `PATCH /api/admin/releases/:slug/review` accepts a validated transition and editorial body. All three HTTP administration routes require the injected authorizer and fail closed until Phase 6 auth is configured. Source state distinguishes `lastCheckedAt` (latest attempt) from `lastSuccessfulAt` (incremental release cutoff), so an outage does not advance the cutoff and hide releases. Source detection uses upserts and only inserts draft records; no automated publishing or destructive migration exists. Integration tests use only the dedicated `PHASE3_MONGODB_TEST_URI` database.
 
 ## Related documents and decisions
 
