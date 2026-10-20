@@ -18,7 +18,7 @@ The browser talks to the web app. Next.js calls Fastify through a server-only ty
 - MongoDB for readiness to report ready; the application can start without a database URI
 
 1. Run `npm install` from the repository root.
-2. Copy `apps/api/.env.example` to `apps/api/.env`. Set `MONGODB_URI` only to a local/development or dedicated test database when needed.
+2. Copy `apps/api/.env.example` to `apps/api/.env` and set `MONGODB_URI` to your development MongoDB Atlas URI. The API loads this file whether started through the root workspace script or from its compiled entry point. It never falls back to local MongoDB; without a URI, or when Atlas is unavailable, readiness stays unavailable.
 3. Copy `apps/web/.env.example` to `apps/web/.env.local` if the Fastify API is not at its local default.
 4. Run `npm run dev` from the repository root. Next.js uses port 3000 and Fastify uses port 4001 by default.
 
@@ -44,7 +44,7 @@ Tailwind CSS v4 is the primary web styling system, with the existing CSS variabl
 
 ## Environment variables
 
-`apps/api/.env.example`: `MONGODB_URI`, `PHASE15_MONGODB_TEST_URI`, `PHASE2_MONGODB_TEST_URI`, `HOST`, `PORT`, and `LOG_LEVEL`.
+`apps/api/.env.example`: `MONGODB_URI` (development Atlas URI), `PHASE15_MONGODB_TEST_URI`, `PHASE2_MONGODB_TEST_URI`, `HOST`, `PORT`, and `LOG_LEVEL`. The example documents the URI shape without containing credentials. Keep the actual value in the ignored `apps/api/.env` file or a secret manager.
 
 `apps/web/.env.example`: server-only `API_BASE_URL`.
 

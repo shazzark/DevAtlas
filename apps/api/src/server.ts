@@ -1,6 +1,10 @@
-import "dotenv/config";
+import { config as loadDotEnv } from "dotenv";
+import { fileURLToPath } from "node:url";
 import { parseEnvironment } from "./config.js";
 import { buildApp } from "./app.js";
+
+// Resolve the API's own environment file even when the workspace is launched from the repository root.
+loadDotEnv({ path: fileURLToPath(new URL("../.env", import.meta.url)) });
 
 const config = parseEnvironment(process.env);
 const app = buildApp(config);
