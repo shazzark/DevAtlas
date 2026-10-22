@@ -9,6 +9,8 @@ import { ReleaseService } from "./features/releases/service.js";
 import { ReleaseMonitorService } from "./features/releases/monitor-service.js";
 import { registerStackGuideRoutes } from "./features/stack-guides/routes.js";
 import type { StackGuideService } from "./features/stack-guides/service.js";
+import { registerBuildGuideRoutes } from "./features/build-guides/routes.js";
+import type { BuildGuideService } from "./features/build-guides/service.js";
 
 export type AppDependencies = {
   checkDatabase?: ReadinessCheck;
@@ -18,6 +20,7 @@ export type AppDependencies = {
   releaseService?: ReleaseService;
   releaseMonitor?: ReleaseMonitorService;
   stackGuideService?: StackGuideService;
+  buildGuideService?: BuildGuideService;
   authorizeReleaseReview?: ReleaseReviewAuthorizer;
 };
 
@@ -40,6 +43,7 @@ export function buildApp(config: ApiConfig, dependencies: AppDependencies = {}):
     authorizeReview: dependencies.authorizeReleaseReview,
   });
   registerStackGuideRoutes(app, dependencies.stackGuideService, dependencies.connectDatabase ?? (() => connectMongo(config.mongoUri)));
+  registerBuildGuideRoutes(app, dependencies.buildGuideService, dependencies.connectDatabase ?? (() => connectMongo(config.mongoUri)));
   app.addHook("onClose", async () => {
     await (dependencies.closeDatabase ?? closeMongoConnection)();
   });

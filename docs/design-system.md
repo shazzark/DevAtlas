@@ -56,6 +56,10 @@ The What's New feed uses source-attributed release cards and filters; release de
 
 The stack explorer uses labeled search and technology-slug filter controls, paginated guide cards and explicit empty/error states. Guide pages reuse shared syntax highlighting and copy controls, with responsive architecture/step content, prerequisites and compatibility alongside references and related technology links. Loading and unpublished/not-found states use semantic headings and status indicators. Production browser checks cover empty/filter validation/not-found and 375/768/1280px overflow behavior.
 
+### Phase 5 build guide components
+
+The build explorer follows the stack catalog patterns with labeled search, technology filtering, pagination and empty/error states. Project pages present ordered implementation steps and rationale, reusable syntax-highlighted copy controls, test commands, troubleshooting, official links and accessible loading/not-found states. Browser checks cover navigation, filter validation and mobile/tablet/desktop overflow; code-copy content checks activate when a published guide exists.
+
 ## Related documents and approval
 
 See [`appflow.md`](appflow.md), [`prd.md`](prd.md) and [`trd.md`](trd.md). Product direction is approved in the PDF; detailed token values and component anatomy are reversible engineering decisions to refine during Phase 1.

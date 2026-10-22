@@ -101,3 +101,7 @@ The release feed and detail pages show published, human-reviewed release explana
 ### Phase 4 Stack Guide delivery notes
 
 The stack explorer and detail route are implemented with source links, architecture, prerequisites, compatibility notes, code examples, troubleshooting and related technology links. Eight curated records are created only in `review` status by the insert-only seed. Public APIs filter to published records and exclude guides whose related technologies are unpublished. The example snippets still require editorial verification before any record is published.
+
+### Phase 5 Build Guide delivery notes
+
+The build explorer and detail route cover the REST Task API, Real-Time Chat and Full-Stack CRUD projects. Each seeded guide includes learning objectives, prerequisites, required technologies, architecture, implementation steps with decision explanations and code, testing instructions, common errors, expected outcome and official references. Seeds are insert-only and stay in `review`; the snippets have not been executed end to end, so no guide is available publicly until editorial verification and publication.

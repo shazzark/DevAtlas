@@ -1,6 +1,7 @@
 import hljs from "highlight.js/lib/core";
 import bash from "highlight.js/lib/languages/bash";
 import css from "highlight.js/lib/languages/css";
+import dockerfile from "highlight.js/lib/languages/dockerfile";
 import javascript from "highlight.js/lib/languages/javascript";
 import json from "highlight.js/lib/languages/json";
 import plaintext from "highlight.js/lib/languages/plaintext";
@@ -9,7 +10,7 @@ import typescript from "highlight.js/lib/languages/typescript";
 import xml from "highlight.js/lib/languages/xml";
 import { CopyCodeButton } from "@/components/copy-code-button";
 
-const languages = { bash, css, javascript, json, jsx: javascript, plaintext, sql, ts: typescript, tsx: typescript, typescript, xml, html: xml };
+const languages = { bash, css, dockerfile, javascript, json, jsx: javascript, plaintext, sql, ts: typescript, tsx: typescript, typescript, xml, html: xml };
 for (const [name, language] of Object.entries(languages)) if (!hljs.getLanguage(name)) hljs.registerLanguage(name, language);
 
 export function SyntaxCode({ title, language, code }: { title: string; language: string; code: string }) {

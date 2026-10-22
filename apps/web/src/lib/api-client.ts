@@ -2,9 +2,11 @@ import "server-only";
 import {
   healthResponseSchema, readinessResponseSchema, releaseDetailResponseSchema, releaseListResponseSchema, technologyDetailResponseSchema, technologyListResponseSchema,
   stackGuideDetailResponseSchema, stackGuideListResponseSchema,
+  buildGuideDetailResponseSchema, buildGuideListResponseSchema,
   type HealthResponse, type ReadinessResponse, type TechnologyListQuery, type Technology,
   type ReleaseListQuery, type Release,
   type StackGuide, type StackGuideListQuery,
+  type BuildGuide, type BuildGuideListQuery,
 } from "@devatlas/shared";
 
 const DEFAULT_API_BASE_URL = "http://127.0.0.1:4001";
@@ -34,7 +36,9 @@ async function get<T>(path: string, parse: (body: unknown) => T): Promise<{ stat
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   const body: unknown = await response.json();
-  if ((path.startsWith("/api/technologies") || path.startsWith("/api/releases") || path.startsWith("/api/stacks")) && !response.ok) throw new ApiClientError(response.status, body);
+  if (["/api/technologies", "/api/releases", "/api/stacks", "/api/builds", "/api/build-guides"].some((prefix) => path.startsWith(prefix)) && !response.ok) {
+    throw new ApiClientError(response.status, body);
+  }
   return { status: response.status, data: parse(body) };
 }
 
@@ -77,5 +81,16 @@ export const apiClient = {
   },
   async getStackGuide(slug: string): Promise<{ status: number; data: { item: StackGuide } }> {
     return get(`/api/stacks/${encodeURIComponent(slug)}`, (body) => stackGuideDetailResponseSchema.parse(body));
+  },
+  async listBuildGuides(query: Partial<BuildGuideListQuery> = {}) {
+    const params = new URLSearchParams();
+    for (const key of ["q", "technologySlug", "page", "limit"] as const) {
+      const value = query[key];
+      if (value !== undefined && value !== "") params.set(key, String(value));
+    }
+    return get(`/api/build-guides${params.size ? `?${params}` : ""}`, (body) => buildGuideListResponseSchema.parse(body));
+  },
+  async getBuildGuide(slug: string): Promise<{ status: number; data: { item: BuildGuide } }> {
+    return get(`/api/build-guides/${encodeURIComponent(slug)}`, (body) => buildGuideDetailResponseSchema.parse(body));
   },
 };

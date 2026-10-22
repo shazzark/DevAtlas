@@ -65,3 +65,7 @@ The monitor checks only configured official sources and records a timestamp, ETa
 ### Phase 4 Stack Guide flow
 
 Visitors open `/stacks`, search by keyword or filter by technology slug, and navigate paginated guide cards. `/stacks/[slug]` shows architecture, prerequisites, compatibility, numbered implementation steps with copyable highlighted examples, troubleshooting, related technologies and official references. Public responses include only published guides whose related technologies are published. Eight source-linked launch candidates are seeded to the private review state; unverified examples remain absent from public pages.
+
+### Phase 5 Build Guide flow
+
+Visitors open `/builds`, search/filter the project catalog and navigate to a guide. `/builds/[slug]` presents objectives, prerequisites, required technologies, architecture, implementation steps with rationale and copyable examples, test instructions, common errors, expected outcome and official references. The three initial projects remain private in review until code and claims are verified; public APIs expose only published guides with published technology relationships.

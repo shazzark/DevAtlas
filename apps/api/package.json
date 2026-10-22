@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "seed:technologies": "npm run build && node dist/features/technologies/seed.js",
     "seed:stack-guides": "npm run build && node dist/features/stack-guides/seed.js",
+    "seed:build-guides": "npm run build && node dist/features/build-guides/seed.js",
     "monitor:releases": "npm run build && node dist/features/releases/monitor-command.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"

@@ -83,6 +83,10 @@ Release lists default to page 1 and 12 items, limit 48, optionally filter by `te
 
 `stack_guides` stores a unique slug, editorial title/summary, related technology slugs, prerequisites, compatibility notes, architecture, ordered steps and code examples, troubleshooting, official references, verification time and `draft|review|published` status. Indexes support published title listing, technology filtering and MongoDB text search. Public list/detail reads require `published`; they resolve each relation against currently published technologies and suppress a guide if a relation is missing or unpublished. The public mapper selects only contract fields, excluding MongoDB subdocument IDs and editorial fields. The insert-only seed prepares eight source-linked records in `review`; examples are not claimed as execution-tested.
 
+### Phase 5 Build Guide module
+
+`build_guides` stores a unique slug, learning objectives, prerequisites, technology slugs, architecture, ordered steps and examples, testing instructions, common errors, outcome, official references, verification time and `draft|review|published` status. Indexes support published title listing, technology filtering and MongoDB text search. Public reads include only published guides whose related technologies remain published. The insert-only seed prepares the three requested project guides in `review`; their examples require execution and editorial verification before publication.
+
 ## Related documents and decisions
 
 See [`prd.md`](prd.md), [`trd.md`](trd.md), [`appflow.md`](appflow.md), [`design-system.md`](design-system.md) and [`implementation-plan.md`](implementation-plan.md). Search indexes, admin provider, audit retention and production deployment are deferred until their implementation phases and evidence.

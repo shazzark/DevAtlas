@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { FiBookOpen, FiLayers, FiMenu, FiZap } from "react-icons/fi";
+import { FiBookOpen, FiCode, FiLayers, FiMenu, FiZap } from "react-icons/fi";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const navigation = [
   { href: "/tools", label: "Explore", icon: FiLayers },
   { href: "/whats-new", label: "What’s new", icon: FiZap },
   { href: "/stacks", label: "Stack guides", icon: FiBookOpen },
+  { href: "/builds", label: "Build guides", icon: FiCode },
 ];
 
 export function SiteHeader() {

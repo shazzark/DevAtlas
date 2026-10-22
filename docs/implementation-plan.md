@@ -103,6 +103,10 @@ Deliver vertical slices in the order below. Phase 1 establishes the product shel
 - **Risks/blockers:** Supporting service credentials for sample applications; prefer local/test-only examples and disclose setup dependencies.
 - **Completion conditions:** Three complete build guides or explicitly recorded blocker; phase committed only when acceptance is met.
 
+- **Observed implementation:** Added the `build_guides` MongoDB model, text/status/technology indexes, shared Zod contracts, published-only Fastify list/detail APIs, search and technology filtering, same-origin BFF routes, `/builds` and `/builds/[slug]` pages, ordered examples with syntax highlighting/copy, objectives, prerequisites, architecture, rationale, testing steps, troubleshooting and official references. The three requested projects are insert-only seeded in `review` status and remain absent from public pages until code is verified and reviewed.
+- **Verification:** Workspace typecheck and unit tests passed (38 API tests and 9 shared tests; 9 tests skipped, including database integration checks). Production build passed. Initial E2E uncovered the list client calling the wrong Fastify route; corrected before focused rerun. E2E copy-content coverage requires a published guide and is expected to skip while the catalog is empty. The full suite also contains technology-explorer tests that require seeded published records.
+- **Editorial completion gate:** Sample code has source references and is explicitly described as instructional, but has not been executed end to end; no guide is published. The supplied owner database has no published technologies, so the insert-only seed cannot create related records there. Seed prerequisites and verification steps are documented; publication remains an editor action after local verification.
+
 ### Phase 6 - Private administration
 
 - **Objective:** Securely manage editorial lifecycle for all content types.
