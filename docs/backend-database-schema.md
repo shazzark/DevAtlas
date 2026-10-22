@@ -79,6 +79,10 @@ The web app renders `/tools` and `/tools/[slug]` with Server Components, and pro
 
 Release lists default to page 1 and 12 items, limit 48, optionally filter by `technologySlug`, and return `{items, pagination}`. Public detail returns `{item}`. `GET /api/admin/releases/candidates` returns `{items}`; `POST /api/admin/releases/monitor` returns the source report; `PATCH /api/admin/releases/:slug/review` accepts a validated transition and editorial body. All three HTTP administration routes require the injected authorizer and fail closed until Phase 6 auth is configured. Source state distinguishes `lastCheckedAt` (latest attempt) from `lastSuccessfulAt` (incremental release cutoff), so an outage does not advance the cutoff and hide releases. Source detection uses upserts and only inserts draft records; no automated publishing or destructive migration exists. Integration tests use only the dedicated `PHASE3_MONGODB_TEST_URI` database.
 
+### Phase 4 Stack Guide module
+
+`stack_guides` stores a unique slug, editorial title/summary, related technology slugs, prerequisites, compatibility notes, architecture, ordered steps and code examples, troubleshooting, official references, verification time and `draft|review|published` status. Indexes support published title listing, technology filtering and MongoDB text search. Public list/detail reads require `published`; they resolve each relation against currently published technologies and suppress a guide if a relation is missing or unpublished. The public mapper selects only contract fields, excluding MongoDB subdocument IDs and editorial fields. The insert-only seed prepares eight source-linked records in `review`; examples are not claimed as execution-tested.
+
 ## Related documents and decisions
 
 See [`prd.md`](prd.md), [`trd.md`](trd.md), [`appflow.md`](appflow.md), [`design-system.md`](design-system.md) and [`implementation-plan.md`](implementation-plan.md). Search indexes, admin provider, audit retention and production deployment are deferred until their implementation phases and evidence.

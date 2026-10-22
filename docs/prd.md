@@ -80,7 +80,7 @@ Developers currently piece together technology explanations, release information
 - [Confirmed] Editors review source-derived drafts before publication; corrections can be recorded.
 - [Confirmed] Success is evaluated through useful search outcomes, guide engagement, working project completions, return visits and actionable feedback. Numerical targets and analytics consent/retention policy remain open.
 - [Open question] Which administrators and identity provider will be used? Resolve before Phase 6; public accounts remain out of scope.
-- [Open question] Which exact initial release breakdowns and up-to-eight stack guides ship? Curate only after source verification.
+- [Resolved for initial curation] Eight Stack Guide topics have been selected and source references added. They remain in review while examples are checked; seed automation does not publish them.
 
 ## Approval and change history
 
@@ -97,3 +97,7 @@ The Technology Explorer now exposes published catalog entries with text search, 
 ### Phase 3 Release Intelligence delivery notes
 
 The release feed and detail pages show published, human-reviewed release explanations with traceable source titles/URLs, applicability, and verification timestamps. Automated source checks may insert draft candidates only; a detected upstream version does not become a public summary or imply verified change analysis. Official npm package metadata, Node.js distribution metadata and Docker Engine/Moby release data are polled; JavaScript TC39, PostgreSQL, MongoDB and Git source pages remain manual sources. The Phase 3 Atlas scan created 20 draft candidates. Public feed/detail endpoints exclude drafts. Review and publication routes remain unavailable until the Phase 6 identity provider is configured.
+
+### Phase 4 Stack Guide delivery notes
+
+The stack explorer and detail route are implemented with source links, architecture, prerequisites, compatibility notes, code examples, troubleshooting and related technology links. Eight curated records are created only in `review` status by the insert-only seed. Public APIs filter to published records and exclude guides whose related technologies are unpublished. The example snippets still require editorial verification before any record is published.

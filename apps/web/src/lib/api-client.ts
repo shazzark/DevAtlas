@@ -1,8 +1,10 @@
 import "server-only";
 import {
   healthResponseSchema, readinessResponseSchema, releaseDetailResponseSchema, releaseListResponseSchema, technologyDetailResponseSchema, technologyListResponseSchema,
+  stackGuideDetailResponseSchema, stackGuideListResponseSchema,
   type HealthResponse, type ReadinessResponse, type TechnologyListQuery, type Technology,
   type ReleaseListQuery, type Release,
+  type StackGuide, type StackGuideListQuery,
 } from "@devatlas/shared";
 
 const DEFAULT_API_BASE_URL = "http://127.0.0.1:4001";
@@ -32,7 +34,7 @@ async function get<T>(path: string, parse: (body: unknown) => T): Promise<{ stat
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   const body: unknown = await response.json();
-  if ((path.startsWith("/api/technologies") || path.startsWith("/api/releases")) && !response.ok) throw new ApiClientError(response.status, body);
+  if ((path.startsWith("/api/technologies") || path.startsWith("/api/releases") || path.startsWith("/api/stacks")) && !response.ok) throw new ApiClientError(response.status, body);
   return { status: response.status, data: parse(body) };
 }
 
@@ -64,5 +66,16 @@ export const apiClient = {
   },
   async getRelease(slug: string): Promise<{ status: number; data: { item: Release } }> {
     return get(`/api/releases/${encodeURIComponent(slug)}`, (body) => releaseDetailResponseSchema.parse(body));
+  },
+  async listStackGuides(query: Partial<StackGuideListQuery> = {}) {
+    const params = new URLSearchParams();
+    for (const key of ["q", "technologySlug", "page", "limit"] as const) {
+      const value = query[key];
+      if (value !== undefined && value !== "") params.set(key, String(value));
+    }
+    return get(`/api/stacks${params.size ? `?${params}` : ""}`, (body) => stackGuideListResponseSchema.parse(body));
+  },
+  async getStackGuide(slug: string): Promise<{ status: number; data: { item: StackGuide } }> {
+    return get(`/api/stacks/${encodeURIComponent(slug)}`, (body) => stackGuideDetailResponseSchema.parse(body));
   },
 };

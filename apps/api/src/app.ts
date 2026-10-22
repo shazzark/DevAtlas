@@ -7,6 +7,8 @@ import type { TechnologyService } from "./features/technologies/service.js";
 import { registerReleaseRoutes, type ReleaseReviewAuthorizer } from "./features/releases/routes.js";
 import { ReleaseService } from "./features/releases/service.js";
 import { ReleaseMonitorService } from "./features/releases/monitor-service.js";
+import { registerStackGuideRoutes } from "./features/stack-guides/routes.js";
+import type { StackGuideService } from "./features/stack-guides/service.js";
 
 export type AppDependencies = {
   checkDatabase?: ReadinessCheck;
@@ -15,6 +17,7 @@ export type AppDependencies = {
   technologyService?: TechnologyService;
   releaseService?: ReleaseService;
   releaseMonitor?: ReleaseMonitorService;
+  stackGuideService?: StackGuideService;
   authorizeReleaseReview?: ReleaseReviewAuthorizer;
 };
 
@@ -36,6 +39,7 @@ export function buildApp(config: ApiConfig, dependencies: AppDependencies = {}):
     monitor: dependencies.releaseMonitor ?? new ReleaseMonitorService(),
     authorizeReview: dependencies.authorizeReleaseReview,
   });
+  registerStackGuideRoutes(app, dependencies.stackGuideService, dependencies.connectDatabase ?? (() => connectMongo(config.mongoUri)));
   app.addHook("onClose", async () => {
     await (dependencies.closeDatabase ?? closeMongoConnection)();
   });

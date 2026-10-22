@@ -5,7 +5,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 const navigation = [
   { href: "/tools", label: "Explore", icon: FiLayers },
   { href: "/whats-new", label: "What’s new", icon: FiZap },
-  { href: "/#guides", label: "Guides", icon: FiBookOpen },
+  { href: "/stacks", label: "Stack guides", icon: FiBookOpen },
 ];
 
 export function SiteHeader() {

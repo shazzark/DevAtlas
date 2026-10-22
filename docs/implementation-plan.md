@@ -88,6 +88,9 @@ Deliver vertical slices in the order below. Phase 1 establishes the product shel
 - **Verification:** Schema/service/API tests and end-to-end guide navigation checks.
 - **Risks/blockers:** Exact guide topics need curation; select from approved product examples and document additions.
 - **Completion conditions:** Complete guide slice, docs/diff review and commit.
+- **Observed implementation:** Added MongoDB `stack_guides` with unique slug, published listing/technology and text indexes; published-only Fastify list/detail APIs with search, technology filtering, pagination and live checks that related technologies are themselves published; same-origin BFF calls; `/stacks` and `/stacks/[slug]` pages with architecture, prerequisites, compatibility, ordered syntax-highlighted/copyable examples, troubleshooting, official links, related technologies, metadata and recovery states. Eight source-linked initial guides are seeded in `review` only. Their examples have not been execution-verified and remain hidden from public APIs as required. Seed is insert-only and refuses missing/unpublished technology links.
+- **Verification:** `npm test` passed 35 API tests and 7 shared-contract tests, with 5 unrelated Mongo integration tests skipped. The two Phase 4 Mongo integration tests passed against the dedicated local `devatlas_phase4_test` database. Workspace typecheck and production build passed. Production Playwright suite passed 19/19 against separately launched web/API processes and a dedicated local test database. Testing exposed and fixed nested Mongo subdocument IDs leaking into the strict public guide contract and stack 404s being parsed as success responses. `git diff --check` passed.
+- **Editorial completion gate:** Eight guides remain in review until their examples are checked against the linked official documentation and an editor confirms publication. No tutorial is currently promoted to public content by seeding.
 
 ### Phase 5 - Build guides
 

@@ -61,3 +61,7 @@ Visitors open `/tools`, enter an optional search term, choose an optional catego
 ### Phase 3 Release Intelligence flow
 
 The monitor checks only configured official sources and records a timestamp, ETag/status and per-source error code. New upstream records become draft candidates with source links and metadata; source excerpts remain untrusted input, and no summary is generated or published automatically. An authorized editor must review the source, add editorial analysis, confirm verification and publish. Public `/whats-new` and `/releases/[slug]` pages and `/api/releases` endpoints query published records only. Empty feeds, invalid filters, unavailable APIs and unknown/unpublished slugs have explicit recovery or error states. The HTTP review endpoints currently fail closed until an admin identity provider is wired in Phase 6; controlled monitoring is available as a backend command.
+
+### Phase 4 Stack Guide flow
+
+Visitors open `/stacks`, search by keyword or filter by technology slug, and navigate paginated guide cards. `/stacks/[slug]` shows architecture, prerequisites, compatibility, numbered implementation steps with copyable highlighted examples, troubleshooting, related technologies and official references. Public responses include only published guides whose related technologies are published. Eight source-linked launch candidates are seeded to the private review state; unverified examples remain absent from public pages.

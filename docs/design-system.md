@@ -52,6 +52,10 @@ Technology cards, filter controls, pagination, profile sections, related links, 
 
 The What's New feed uses source-attributed release cards and filters; release detail pages distinguish source metadata from editorial explanations and show verification date and source links. Empty feed, API failure, invalid filter, loading and not-found states use the catalog's semantic tokens and accessible headings/statuses. Code examples keep the shared syntax-highlighted surface and copy status. The Playwright suite checks release recovery, themes, keyboard navigation and mobile overflow at 375px; all 15 end-to-end tests passed against the production web build and live Fastify service.
 
+### Phase 4 guide components
+
+The stack explorer uses labeled search and technology-slug filter controls, paginated guide cards and explicit empty/error states. Guide pages reuse shared syntax highlighting and copy controls, with responsive architecture/step content, prerequisites and compatibility alongside references and related technology links. Loading and unpublished/not-found states use semantic headings and status indicators. Production browser checks cover empty/filter validation/not-found and 375/768/1280px overflow behavior.
+
 ## Related documents and approval
 
 See [`appflow.md`](appflow.md), [`prd.md`](prd.md) and [`trd.md`](trd.md). Product direction is approved in the PDF; detailed token values and component anatomy are reversible engineering decisions to refine during Phase 1.
