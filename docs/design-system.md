@@ -54,11 +54,17 @@ The What's New feed uses source-attributed release cards and filters; release de
 
 ### Phase 4 guide components
 
-The stack explorer uses labeled search and technology-slug filter controls, paginated guide cards and explicit empty/error states. Guide pages reuse shared syntax highlighting and copy controls, with responsive architecture/step content, prerequisites and compatibility alongside references and related technology links. Loading and unpublished/not-found states use semantic headings and status indicators. Production browser checks cover empty/filter validation/not-found and 375/768/1280px overflow behavior.
+The stack explorer uses labeled search and technology-name filter controls that submit the existing technology slug, paginated guide cards and explicit empty/error states. Guide pages reuse shared syntax highlighting and copy controls, with responsive architecture/step content, prerequisites and compatibility alongside references and related technology links. Loading and unpublished/not-found states use semantic headings and status indicators. Production browser checks cover empty/filter validation/not-found and responsive overflow behavior.
 
 ### Phase 5 build guide components
 
-The build explorer follows the stack catalog patterns with labeled search, technology filtering, pagination and empty/error states. Project pages present ordered implementation steps and rationale, reusable syntax-highlighted copy controls, test commands, troubleshooting, official links and accessible loading/not-found states. Browser checks cover navigation, filter validation and mobile/tablet/desktop overflow; code-copy content checks activate when a published guide exists.
+The build explorer follows the stack catalog patterns with labeled search, technology-name filtering that submits the existing technology slug, pagination and empty/error states. Project pages present ordered implementation steps and rationale, reusable syntax-highlighted copy controls, test commands, troubleshooting, official links and accessible loading/not-found states. Browser checks cover navigation, filter validation and responsive overflow; code-copy content checks activate when a published guide exists.
+
+### Frontend audit refinements
+
+The light-theme faint-text token is darkened to meet WCAG AA normal-text contrast against the canvas and surface colors. Heading defaults now live in Tailwind's base layer so page-level utility classes determine component heading sizes. Inputs, selects and textareas retain a shared visible keyboard focus outline. The mobile menu includes the same unified Search destination as desktop navigation. Stack and Build Guide technology filters display technology names while preserving the established `technologySlug` query parameter and API contract. Code examples can receive keyboard focus for scrolling, have a descriptive accessible label, and use a high-contrast focus outline; the Copy control uses a light foreground suited to its fixed dark surface in both themes.
+
+The frontend audit Playwright suite checks 320, 375, 768 and 1280 CSS-pixel widths across public listing, technology detail, and not-found pages in both themes; it checks light and dark text token contrast over canvas and surface backgrounds and the code-copy control against its dark panel. Published guide and release detail checks use read-only API lookups and skip when content is absent from the configured local database. Automated contrast checks do not replace a full manual WCAG review or screen-reader testing.
 
 ### Phase 6 admin components
 

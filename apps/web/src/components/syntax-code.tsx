@@ -20,6 +20,6 @@ export function SyntaxCode({ title, language, code }: { title: string; language:
   const highlighted = hljs.highlight(code, { language: safeLanguage, ignoreIllegals: true }).value;
   return <figure className="overflow-hidden rounded-xl border border-border bg-[#171916] text-[#eeefe9]">
     <figcaption className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3"><span className="min-w-0 truncate text-sm font-medium">{title}</span><div className="flex shrink-0 items-center gap-3"><span className="font-mono text-[10px] uppercase tracking-wide text-white/50">{language}</span><CopyCodeButton code={code} /></div></figcaption>
-    <pre className="max-h-[560px] overflow-auto p-4 text-[13px] leading-6"><code className={`hljs language-${safeLanguage}`} dangerouslySetInnerHTML={{ __html: highlighted }} /></pre>
+    <pre aria-label={`${title} code example`} className="max-h-[560px] overflow-auto p-4 text-[13px] leading-6 focus-visible:outline-3 focus-visible:outline-offset-[-3px] focus-visible:outline-[#a3c4aa]" role="group" tabIndex={0}><code className={`hljs language-${safeLanguage}`} dangerouslySetInnerHTML={{ __html: highlighted }} /></pre>
   </figure>;
 }

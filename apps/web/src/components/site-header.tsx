@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FiBookOpen, FiCode, FiLayers, FiMenu, FiZap } from "react-icons/fi";
+import { FiBookOpen, FiCode, FiLayers, FiMenu, FiSearch, FiZap } from "react-icons/fi";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const navigation = [
@@ -31,6 +31,7 @@ export function SiteHeader() {
               {navigation.map(({ href, label, icon: Icon }) => (
                 <Link className="flex items-center gap-[11px] rounded-md p-2.5 text-sm text-text-soft hover:bg-surface-muted hover:text-text" href={href} key={href}><Icon aria-hidden="true" />{label}</Link>
               ))}
+              <Link className="flex items-center gap-[11px] rounded-md p-2.5 text-sm text-text-soft hover:bg-surface-muted hover:text-text" href="/search"><FiSearch aria-hidden="true" />Search</Link>
             </nav>
           </details>
         </div>

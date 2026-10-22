@@ -18,8 +18,14 @@ export default async function BuildsPage({ searchParams }: { searchParams: Searc
   const rawPage = Number(first(params.page) ?? "1");
   const page = Number.isInteger(rawPage) && rawPage > 0 ? Math.min(rawPage, 10_000) : 1;
   let result: Awaited<ReturnType<typeof apiClient.listBuildGuides>>;
+  let technologies: Array<{ slug: string; name: string }>;
   try {
-    result = await apiClient.listBuildGuides({ q, technologySlug, page, limit: 12 });
+    const [guideResult, technologyResult] = await Promise.all([
+      apiClient.listBuildGuides({ q, technologySlug, page, limit: 12 }),
+      apiClient.listTechnologies({ limit: 48 }),
+    ]);
+    result = guideResult;
+    technologies = technologyResult.data.items.map(({ slug, name }) => ({ slug, name }));
   } catch {
     return <main id="main-content" className="mx-auto min-h-[70vh] w-[min(1120px,calc(100%-40px))] py-16 md:py-24"><p className="mb-3 font-mono text-xs uppercase tracking-widest text-text-soft">Build guides</p><h1 className="mb-4 text-4xl font-semibold tracking-tight">Project guides are temporarily unavailable.</h1><p className="max-w-xl text-text-soft">We couldn’t load build guides. Check your connection and try again.</p><Link className="mt-7 inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-canvas" href="/builds">Try again <FiArrowRight aria-hidden="true" /></Link></main>;
   }
@@ -38,7 +44,7 @@ export default async function BuildsPage({ searchParams }: { searchParams: Searc
     <header className="mb-10 border-b border-border pb-9 md:mb-12"><p className="mb-3 font-mono text-xs uppercase tracking-widest text-text-soft">Learn by building / 05</p><div className="flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><h1 className="mb-3 text-4xl font-semibold tracking-tight md:text-5xl">Build Guides</h1><p className="max-w-2xl text-base leading-7 text-text-soft">Follow practical projects from a clear architecture through implementation and testing.</p></div><span className="text-sm text-text-faint">{listing.pagination.totalItems} projects</span></div></header>
     <form action="/builds" className="mb-8 grid gap-3 rounded-xl border border-border bg-surface-muted p-3 sm:grid-cols-[minmax(0,1fr)_minmax(180px,220px)_auto] sm:p-4">
       <label className="flex min-h-11 items-center gap-3 rounded-lg border border-border bg-surface px-3 text-text-faint"><FiSearch aria-hidden="true" /><span className="sr-only">Search build guides</span><input aria-label="Search build guides" className="min-w-0 flex-1 bg-transparent text-sm text-text outline-none placeholder:text-text-faint" name="q" placeholder="Search projects…" defaultValue={q} /></label>
-      <label className="flex min-h-11 items-center gap-2 rounded-lg border border-border bg-surface px-3 text-sm text-text-soft"><span className="sr-only">Filter by technology slug</span><input aria-label="Filter by technology slug" className="w-full bg-transparent text-text outline-none placeholder:text-text-faint" name="technologySlug" placeholder="Technology slug" defaultValue={technologySlug} /></label>
+      <label className="flex min-h-11 items-center gap-2 rounded-lg border border-border bg-surface px-3 text-sm text-text-soft"><span className="sr-only">Filter by technology</span><select aria-label="Filter by technology" className="w-full bg-transparent text-text" name="technologySlug" defaultValue={technologySlug}><option value="">All technologies</option>{technologySlug && !technologies.some(({ slug }) => slug === technologySlug) && <option value={technologySlug}>Unrecognized technology filter</option>}{technologies.map((technology) => <option key={technology.slug} value={technology.slug}>{technology.name}</option>)}</select></label>
       <button className="min-h-11 rounded-lg bg-accent px-5 text-sm font-semibold text-canvas transition-colors hover:bg-accent-strong" type="submit">Search</button>
     </form>
     {listing.items.length ? <>

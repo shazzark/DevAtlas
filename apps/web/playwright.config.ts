@@ -17,7 +17,7 @@ export default defineConfig({
   ...(process.env.PLAYWRIGHT_BASE_URL ? {} : {
     webServer: {
       command: "npm run dev --prefix ../..",
-      url: `${baseURL}/api/health`,
+      url: `${baseURL}/api/health/ready`,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
     },
