@@ -10,7 +10,7 @@ describe("stack guide HTTP routes", () => {
 
   it("validates list filters before connecting to MongoDB", async () => {
     const connectDatabase = vi.fn(async () => undefined);
-    const app = buildApp(config, { connectDatabase, closeDatabase: async () => undefined });
+    const app = await buildApp(config, { connectDatabase, closeDatabase: async () => undefined });
     const response = await app.inject({ method: "GET", url: "/api/stacks?page=0" });
     await app.close();
     expect(response.statusCode).toBe(400);
@@ -19,7 +19,7 @@ describe("stack guide HTTP routes", () => {
   });
 
   it("returns a safe unavailable response when MongoDB cannot connect", async () => {
-    const app = buildApp(config, { connectDatabase: async () => { throw new Error("private URI detail"); }, closeDatabase: async () => undefined });
+    const app = await buildApp(config, { connectDatabase: async () => { throw new Error("private URI detail"); }, closeDatabase: async () => undefined });
     const response = await app.inject({ method: "GET", url: "/api/stacks" });
     await app.close();
     expect(response.statusCode).toBe(503);
@@ -29,7 +29,7 @@ describe("stack guide HTTP routes", () => {
 
   it("returns public details and safely hides unavailable slugs", async () => {
     const service = new StackGuideService({ findPublishedBySlug: vi.fn(async () => null) } as never);
-    const app = buildApp(config, { connectDatabase: async () => undefined, closeDatabase: async () => undefined, stackGuideService: service });
+    const app = await buildApp(config, { connectDatabase: async () => undefined, closeDatabase: async () => undefined, stackGuideService: service });
     const invalid = await app.inject({ method: "GET", url: "/api/stacks/not-valid!" });
     const missing = await app.inject({ method: "GET", url: "/api/stacks/unpublished-guide" });
     await app.close();

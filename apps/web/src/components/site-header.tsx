@@ -23,7 +23,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-4 max-[680px]:gap-1">
-          <Link className="inline-flex items-center gap-[26px] text-xs text-text-faint hover:text-text max-[680px]:hidden" href="/tools"><span>Search</span><kbd>/</kbd></Link>
+          <Link className="inline-flex items-center gap-[26px] text-xs text-text-faint hover:text-text max-[680px]:hidden" href="/search"><span>Search</span><kbd>/</kbd></Link>
           <ThemeToggle />
           <details className="relative hidden max-[680px]:block">
             <summary aria-label="Open navigation menu" className="grid size-10 cursor-pointer list-none place-items-center text-[19px] [&::-webkit-details-marker]:hidden" role="button"><FiMenu aria-hidden="true" /></summary>

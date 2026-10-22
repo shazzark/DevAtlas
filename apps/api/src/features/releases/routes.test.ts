@@ -24,7 +24,7 @@ describe("release routes", () => {
       listPublished: vi.fn(async () => ({ items: [], pagination: { page: 1, limit: 12, totalItems: 0, totalPages: 0 } })),
       findPublishedBySlug: vi.fn(async () => null),
     };
-    const app = buildApp(config, { releaseService: new ReleaseService(repository as unknown as ReleaseRepository) });
+    const app = await buildApp(config, { releaseService: new ReleaseService(repository as unknown as ReleaseRepository), connectDatabase: async () => undefined });
     const list = await app.inject({ method: "GET", url: "/api/releases" });
     const invalid = await app.inject({ method: "GET", url: "/api/releases?technologySlug=not%20a%20slug" });
     const missing = await app.inject({ method: "GET", url: "/api/releases/not-found" });
@@ -38,13 +38,13 @@ describe("release routes", () => {
 
   it("fails closed when review authorization is missing or denies the request", async () => {
     const service = new ReleaseService({ listCandidates: vi.fn(async () => []) } as unknown as ReleaseRepository);
-    const unconfigured = buildApp(config, { releaseService: service });
+    const unconfigured = await buildApp(config, { releaseService: service });
     const unavailable = await unconfigured.inject({ method: "GET", url: "/api/admin/releases/candidates" });
     await unconfigured.close();
     expect(unavailable.statusCode).toBe(503);
     expect(unavailable.json()).toMatchObject({ error: { code: "REVIEW_AUTH_UNAVAILABLE" } });
 
-    const denied = buildApp(config, { releaseService: service, authorizeReleaseReview: async () => null });
+    const denied = await buildApp(config, { releaseService: service, authorizeReleaseReview: async () => null });
     const response = await denied.inject({ method: "GET", url: "/api/admin/releases/candidates" });
     await denied.close();
     expect(response.statusCode).toBe(401);
@@ -58,10 +58,12 @@ describe("release routes", () => {
       updateEditorialDecision: vi.fn(async () => ({ slug: "react-19-npm-react", status: "review", lastVerifiedAt: null })),
     };
     const monitor = { run: vi.fn(async () => ({ checkedAt: "2026-10-20T12:00:00.000Z", checkedSources: 7, failedSources: 1, newCandidates: 0, discoveredCandidates: 0, failures: [{ sourceKey: "npm:react", code: "SOURCE_RATE_LIMITED" }] })) };
-    const app = buildApp(config, {
+    const app = await buildApp(config, {
       releaseService: new ReleaseService(repository as unknown as ReleaseRepository),
       releaseMonitor: monitor as unknown as ReleaseMonitorService,
       authorizeReleaseReview: async () => ({ actorId: "reviewer-test" }),
+      connectDatabase: async () => undefined,
+      adminAudit: async () => undefined,
     });
     const review = await app.inject({ method: "PATCH", url: "/api/admin/releases/react-19-npm-react/review", payload: { decision: "submit_for_review", content } });
     const monitorResponse = await app.inject({ method: "POST", url: "/api/admin/releases/monitor" });

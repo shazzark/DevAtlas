@@ -60,6 +60,18 @@ The stack explorer uses labeled search and technology-slug filter controls, pagi
 
 The build explorer follows the stack catalog patterns with labeled search, technology filtering, pagination and empty/error states. Project pages present ordered implementation steps and rationale, reusable syntax-highlighted copy controls, test commands, troubleshooting, official links and accessible loading/not-found states. Browser checks cover navigation, filter validation and mobile/tablet/desktop overflow; code-copy content checks activate when a published guide exists.
 
+### Phase 6 admin components
+
+The private workspace uses explicit section buttons, labeled JSON editing fields, status filters, action feedback through a live region, and confirmation checkboxes for publishing. The setup screen explains when OAuth credentials are not configured. Admin routes and metadata remain excluded from search indexing. Review content uses the same type and spacing tokens as the public catalog.
+
+### Phase 7 search components
+
+The unified search page uses a labeled keyword field, content-type selector and technology selector in a responsive GET form. Result cards identify their content type and link to the matching public detail page; related recommendations are grouped under a separate heading. Results announce their count, pagination has a descriptive navigation label, and no-match and service-failure states offer recovery links. Browser coverage checks empty state and 375/768/1280px overflow.
+
+### Phase 8 crawler metadata
+
+Search uses `noindex, follow`; the sitemap lists public routes and currently published results. `robots.txt` excludes `/admin` and `/api/`. Canonical origin comes from validated `SITE_URL` and must be set to the production HTTPS origin.
+
 ## Related documents and approval
 
 See [`appflow.md`](appflow.md), [`prd.md`](prd.md) and [`trd.md`](trd.md). Product direction is approved in the PDF; detailed token values and component anatomy are reversible engineering decisions to refine during Phase 1.

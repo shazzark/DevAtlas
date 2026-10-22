@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
+import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: siteUrl(),
   title: "DevAtlas — Stay current. Understand the tools.",
   description: "A clear path through the tools, releases, and connections that shape modern software development.",
 };

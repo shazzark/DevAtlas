@@ -6,9 +6,9 @@ const uri = process.env.PHASE15_MONGODB_TEST_URI;
 const suite = uri ? describe : describe.skip;
 
 suite("MongoDB readiness integration", () => {
-  const app = buildApp(parseEnvironment({ MONGODB_URI: uri, HOST: "127.0.0.1", PORT: "4001", LOG_LEVEL: "silent" }));
+  let app: Awaited<ReturnType<typeof buildApp>>;
 
-  beforeAll(async () => app.ready());
+  beforeAll(async () => { app = await buildApp(parseEnvironment({ MONGODB_URI: uri, HOST: "127.0.0.1", PORT: "4001", LOG_LEVEL: "silent" })); await app.ready(); });
   afterAll(async () => app.close());
 
   it("returns ready only after the actual MongoDB deployment responds to ping", async () => {

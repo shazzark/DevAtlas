@@ -14,7 +14,7 @@ const stackGuideSchema = new Schema({
   steps: { type: [{ title: { type: String, required: true }, explanation: { type: String, required: true }, code: { title: { type: String, required: true }, language: { type: String, required: true }, code: { type: String, required: true }, explanation: { type: String, required: true } } }], required: true, validate: { validator: (values: unknown[]) => values.length > 0 } },
   troubleshooting: { type: [{ problem: { type: String, required: true }, solution: { type: String, required: true } }], required: true, validate: { validator: (values: unknown[]) => values.length > 0 } },
   references: { type: [{ label: { type: String, required: true }, url: { type: String, required: true } }], required: true, validate: { validator: (values: unknown[]) => values.length > 0 } },
-  lastVerifiedAt: { type: Date, required: true },
+  lastVerifiedAt: { type: Date, default: null },
   status: { type: String, enum: ["draft", "review", "published"], required: true, default: "draft" },
 }, { timestamps: true, strict: "throw", collection: "stack_guides" });
 

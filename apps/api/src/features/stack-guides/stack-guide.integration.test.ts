@@ -12,10 +12,11 @@ const guideSlugs = ["phase4-fixture-public-guide", "phase4-fixture-draft-guide",
 
 suite("stack guide MongoDB integration", () => {
   const config = parseEnvironment({ MONGODB_URI: uri, HOST: "127.0.0.1", PORT: "4001", LOG_LEVEL: "silent" });
-  const app = buildApp(config, { checkDatabase: async () => undefined, closeDatabase: async () => undefined });
+  let app: Awaited<ReturnType<typeof buildApp>>;
 
   beforeAll(async () => {
     await mongoose.connect(uri!);
+    app = await buildApp(config, { checkDatabase: async () => undefined, closeDatabase: async () => undefined });
     await TechnologyModel.init();
     await StackGuideModel.init();
     await TechnologyModel.deleteMany({ slug: { $in: technologySlugs } });

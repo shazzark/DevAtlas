@@ -34,7 +34,7 @@ function publicGuide(record: Record<string, unknown>, technologies: { slug: stri
 
 export class StackGuideRepository {
   async listPublished(query: StackGuideListQuery) {
-    const filter: Record<string, unknown> = { status: "published" };
+    const filter: Record<string, unknown> = { status: "published", lastVerifiedAt: { $ne: null } };
     if (query.technologySlug) filter.technologySlugs = query.technologySlug;
     if (query.q) filter.$text = { $search: query.q };
     const [result] = await StackGuideModel.aggregate([
@@ -74,7 +74,7 @@ export class StackGuideRepository {
   }
 
   async findPublishedBySlug(slug: string) {
-    const record = await StackGuideModel.findOne({ slug, status: "published" }).lean();
+    const record = await StackGuideModel.findOne({ slug, status: "published", lastVerifiedAt: { $ne: null } }).lean();
     if (!record) return null;
     const slugs = record.technologySlugs;
     const technologies = await TechnologyModel.find({ slug: { $in: slugs }, status: "published" }).select({ slug: 1, name: 1, _id: 0 }).lean();

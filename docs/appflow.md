@@ -69,3 +69,15 @@ Visitors open `/stacks`, search by keyword or filter by technology slug, and nav
 ### Phase 5 Build Guide flow
 
 Visitors open `/builds`, search/filter the project catalog and navigate to a guide. `/builds/[slug]` presents objectives, prerequisites, required technologies, architecture, implementation steps with rationale and copyable examples, test instructions, common errors, expected outcome and official references. The three initial projects remain private in review until code and claims are verified; public APIs expose only published guides with published technology relationships.
+
+### Phase 6 administration flow
+
+An operator configures GitHub OAuth, the numeric GitHub account-ID allow-list and a shared server-only JWT key. An authorized editor signs in at `/admin/login`; the server checks the Auth.js session before the BFF sends short-lived signed requests to Fastify. Editors create or update draft/review content, explicitly confirm verification before publication, and can return published items to draft for correction. Release candidates keep official source metadata immutable while editors write editorial analysis. Each successful content transition, release review and source scan records an audit event. Missing auth settings leave the private workflow unavailable.
+
+### Phase 7 unified search flow
+
+Visitors use `/search` from the site header, enter a keyword, choose a content type and optionally a technology, then browse paginated results. The API combines MongoDB text search across published technologies and releases and verified guides, and provides related records from shared technologies. Search terms and visitor identities are not stored; daily aggregate counts keep only category and whether a keyword was present. Empty results, filters, and unavailable services have explicit states.
+
+### Phase 8 public discovery and deployment
+
+`/robots.txt` allows public pages while excluding admin and BFF paths. `/sitemap.xml` includes stable public routes and current published search results. The web and API deploy as separate Node services; the browser calls only Next.js and the web server uses its internal `API_BASE_URL` to reach Fastify. See [`deployment.md`](deployment.md) for required Atlas, OAuth, URL and secret configuration and smoke checks.

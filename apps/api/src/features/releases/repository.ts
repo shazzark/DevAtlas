@@ -150,7 +150,7 @@ export class ReleaseRepository {
       set.reviewedBy = actorId;
       set.publishedAt = new Date();
     }
-    const result = await ReleaseModel.findOneAndUpdate({ slug, status: expectedStatus }, { $set: set }, { new: true, runValidators: true }).lean();
+    const result = await ReleaseModel.findOneAndUpdate({ slug, status: expectedStatus }, { $set: set }, { returnDocument: "after", runValidators: true }).lean();
     return result ? { slug: result.slug, status: result.status, lastVerifiedAt: toIso(result.lastVerifiedAt as Date | null) } : null;
   }
 }

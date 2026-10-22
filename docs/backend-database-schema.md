@@ -24,7 +24,7 @@ packages/shared: Zod request/response contracts and TypeScript types only
 - **Feature services:** Enforce content lifecycle and use cases without depending on Next.js request/response objects.
 - **Repositories:** Located in the backend and own Mongoose queries for their feature; avoid generic CRUD abstractions that hide query intent.
 - **Validation:** Zod schemas validate untrusted API input at the Fastify boundary; shared response schemas validate backend responses consumed by the web app.
-- **Authentication/authorization:** Server-side admin identity and action checks; provider choice remains open until Phase 6.
+- **Authentication/authorization:** Server-side GitHub OAuth allow-list, short-lived signed service assertions, and backend action checks; operator credentials are described in [`admin-access.md`](admin-access.md).
 - **Content processing:** Official source ingestion/detection can produce review drafts. It cannot publish. External content is untrusted input.
 - **UI:** Server Components load public content through the server-only API client; Client Components are reserved for interaction such as theme control, search controls and copy buttons. Tailwind CSS is the primary styling system; theme variables are exposed as semantic utilities.
 
@@ -81,12 +81,24 @@ Release lists default to page 1 and 12 items, limit 48, optionally filter by `te
 
 ### Phase 4 Stack Guide module
 
-`stack_guides` stores a unique slug, editorial title/summary, related technology slugs, prerequisites, compatibility notes, architecture, ordered steps and code examples, troubleshooting, official references, verification time and `draft|review|published` status. Indexes support published title listing, technology filtering and MongoDB text search. Public list/detail reads require `published`; they resolve each relation against currently published technologies and suppress a guide if a relation is missing or unpublished. The public mapper selects only contract fields, excluding MongoDB subdocument IDs and editorial fields. The insert-only seed prepares eight source-linked records in `review`; examples are not claimed as execution-tested.
+`stack_guides` stores a unique slug, editorial title/summary, related technology slugs, prerequisites, compatibility notes, architecture, ordered steps and code examples, troubleshooting, official references, nullable verification time and `draft|review|published` status. Verification time stays null on unverified seeds; admin publication requires a timestamp and explicit confirmation. Indexes support published title listing, technology filtering and MongoDB text search. Public list/detail reads require `published` and non-null verification time; they resolve each relation against currently published technologies and suppress a guide if a relation is missing or unpublished. The public mapper selects only contract fields, excluding MongoDB subdocument IDs and editorial fields. The insert-only seed prepares eight source-linked records in `review`; examples are not claimed as execution-tested.
 
 ### Phase 5 Build Guide module
 
-`build_guides` stores a unique slug, learning objectives, prerequisites, technology slugs, architecture, ordered steps and examples, testing instructions, common errors, outcome, official references, verification time and `draft|review|published` status. Indexes support published title listing, technology filtering and MongoDB text search. Public reads include only published guides whose related technologies remain published. The insert-only seed prepares the three requested project guides in `review`; their examples require execution and editorial verification before publication.
+`build_guides` stores a unique slug, learning objectives, prerequisites, technology slugs, architecture, ordered steps and examples, testing instructions, common errors, outcome, official references, nullable verification time and `draft|review|published` status. Indexes support published title listing, technology filtering and MongoDB text search. Public reads include only published guides with a verification timestamp whose related technologies remain published. The insert-only seed prepares the three requested project guides in `review` with no claimed verification timestamp; their examples require execution and editorial verification before publication.
+
+### Phase 6 administration and audit module
+
+`admin_audit_events` stores actor ID, action, content type/slug, previous and next status, changed field names and creation time. It avoids copying submitted content into the audit record. Its indexes support recent-event and per-content history reads. The Next.js BFF verifies the Auth.js session and allow-list before minting a 30-second JWT; Fastify independently verifies its HS256 signature, issuer, audience, age, role and numeric actor ID. Admin routes validate content through strict Mongoose schemas and enforce compare-and-set status transitions. Public repositories continue to require `published`.
 
 ## Related documents and decisions
 
-See [`prd.md`](prd.md), [`trd.md`](trd.md), [`appflow.md`](appflow.md), [`design-system.md`](design-system.md) and [`implementation-plan.md`](implementation-plan.md). Search indexes, admin provider, audit retention and production deployment are deferred until their implementation phases and evidence.
+See [`prd.md`](prd.md), [`trd.md`](trd.md), [`appflow.md`](appflow.md), [`design-system.md`](design-system.md) and [`implementation-plan.md`](implementation-plan.md). Search indexes and the admin provider are implemented; audit retention and host selection remain operational decisions.
+
+### Phase 7 unified search and metrics
+
+`GET /api/search?q=&category=&technologySlug=&page=&limit=` searches four public content collections using MongoDB text indexes and text score. It supports `technology|release|stack|build`, an optional published technology slug, and global page/limit parameters. Releases and guides require a verification timestamp; guides also require every referenced technology to remain published. Search result projections contain only public title/summary/path and technology slugs. Related results are found through shared published technologies. The web proxy validates the same shared Zod query and response types. `search_daily_metrics` aggregates UTC day, category, keyword-present flag and count with a 366-day TTL; it stores no query values or user identifiers.
+
+### Phase 8 runtime configuration
+
+The separate services and launch environment are documented in [`deployment.md`](deployment.md). The API requires Atlas configuration for readiness; only it receives `MONGODB_URI`. The web requires private `API_BASE_URL`, public `SITE_URL`, and admin OAuth/signing values before private publishing is available. Robots and dynamic sitemap handlers use Next.js metadata file conventions.

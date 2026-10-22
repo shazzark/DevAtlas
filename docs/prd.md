@@ -59,7 +59,7 @@ Developers currently piece together technology explanations, release information
 - **Requirement:** [Confirmed] Private administration manages technologies, releases, Stack Guides and Build Guides with draft, review and published states. Content quality includes source links, version applicability, editorial review, last-verified timestamps and a correction workflow.
 - **Priority/status:** Must have; approved baseline.
 - **Acceptance criteria:** Only an authenticated authorized administrator can manage content; public APIs and pages expose only published records; publication records review and verification evidence.
-- **Related journey/dependency:** Phase 6; depends on content modules and an approved identity design.
+- **Related journey/dependency:** Phase 6; depends on content modules and the selected GitHub OAuth allow-list.
 
 ### PR-07 Free educational core
 
@@ -79,12 +79,16 @@ Developers currently piece together technology explanations, release information
 - [Confirmed] Official sources and traceability are required for release claims; never invent versions, release dates, credentials or API access.
 - [Confirmed] Editors review source-derived drafts before publication; corrections can be recorded.
 - [Confirmed] Success is evaluated through useful search outcomes, guide engagement, working project completions, return visits and actionable feedback. Numerical targets and analytics consent/retention policy remain open.
-- [Open question] Which administrators and identity provider will be used? Resolve before Phase 6; public accounts remain out of scope.
+- [Resolved for MVP] Admins use GitHub OAuth. Operators allow-list immutable numeric GitHub account IDs; no public accounts are introduced. OAuth app credentials and the IDs must be configured in each deployment before an administrator can sign in.
 - [Resolved for initial curation] Eight Stack Guide topics have been selected and source references added. They remain in review while examples are checked; seed automation does not publish them.
 
 ## Approval and change history
 
 The product owner approved the PDF as the initial specification on 20 October 2026. The user authorized planning and sequential MVP implementation in this request. Changes that materially alter this scope must be recorded here and in the implementation plan.
+
+### Phase 6 administration delivery notes
+
+The private editor uses Auth.js GitHub OAuth with numeric GitHub account IDs as the allow-list. The web server signs short-lived admin assertions for Fastify, which verifies the role and signature independently. Content edits and release review use explicit status transitions, verification confirmation and audit events. Required operator settings are listed in [`admin-access.md`](admin-access.md); admin remains unavailable until those values are set.
 
 ## Delivery architecture update
 
@@ -105,3 +109,11 @@ The stack explorer and detail route are implemented with source links, architect
 ### Phase 5 Build Guide delivery notes
 
 The build explorer and detail route cover the REST Task API, Real-Time Chat and Full-Stack CRUD projects. Each seeded guide includes learning objectives, prerequisites, required technologies, architecture, implementation steps with decision explanations and code, testing instructions, common errors, expected outcome and official references. Seeds are insert-only and stay in `review`; the snippets have not been executed end to end, so no guide is available publicly until editorial verification and publication.
+
+### Phase 7 search delivery notes
+
+`/search` and `GET /api/search` discover technologies, releases, Stack Guides and Build Guides with MongoDB text relevance, content and technology filters, pagination and related content. Search metrics are daily aggregates without raw terms or visitor identifiers. Search remains unavailable when MongoDB is unreachable and reports a retry state instead of an empty result.
+
+### Phase 8 release preparation notes
+
+Public crawler metadata includes a published-content sitemap and robots rules that exclude administration and API routes. The provider-neutral deployment guide documents separate Next.js/Fastify services, Atlas networking and all required environment values. Production readiness still requires owner-supplied production Atlas access, GitHub OAuth credentials and a hosting account/domain; no deployment or push is authorized.

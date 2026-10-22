@@ -5,7 +5,6 @@ import { TechnologyModel } from "../technologies/model.js";
 import { closeMongoConnection, connectMongo } from "../../infrastructure/database/mongoose.js";
 import { StackGuideModel } from "./model.js";
 
-const verifiedAt = new Date("2026-10-22T00:00:00.000Z");
 
 const guides = [
   {
@@ -208,7 +207,7 @@ try {
 
   await Promise.all(guides.map((guide) => StackGuideModel.updateOne(
     { slug: guide.slug },
-    { $setOnInsert: { ...guide, lastVerifiedAt: verifiedAt, status: "review" } },
+    { $setOnInsert: { ...guide, lastVerifiedAt: null, status: "review" } },
     { upsert: true, runValidators: true },
   )));
   console.log(`Ensured ${guides.length} source-backed Stack Guides in review status; code examples have not been represented as execution-tested.`);

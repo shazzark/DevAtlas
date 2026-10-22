@@ -4,6 +4,10 @@ const optionalMongoUri = z.preprocess(
   (value) => typeof value === "string" && value.trim() === "" ? undefined : value,
   z.string().url().refine((value) => value.startsWith("mongodb://") || value.startsWith("mongodb+srv://")).optional(),
 );
+const optionalAdminSecret = z.preprocess(
+  (value) => typeof value === "string" && value.trim() === "" ? undefined : value,
+  z.string().min(32).optional(),
+);
 
 const environmentSchema = z.object({
   MONGODB_URI: optionalMongoUri,
@@ -12,6 +16,7 @@ const environmentSchema = z.object({
   HOST: z.string().trim().min(1).default("127.0.0.1"),
   PORT: z.coerce.number().int().min(1).max(65_535).default(4001),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
+  ADMIN_API_JWT_SECRET: optionalAdminSecret,
 }).superRefine((environment, context) => {
   if (environment.MONGODB_URI && environment.DATABASE_URL && environment.MONGODB_URI !== environment.DATABASE_URL) {
     context.addIssue({ code: "custom", path: ["MONGODB_URI"], message: "MONGODB_URI and DATABASE_URL must match when both are set" });
@@ -23,6 +28,7 @@ export type ApiConfig = {
   host: string;
   port: number;
   logLevel: "fatal" | "error" | "warn" | "info" | "debug" | "trace" | "silent";
+  adminApiJwtSecret: string | undefined;
 };
 
 export function parseEnvironment(environment: NodeJS.ProcessEnv): ApiConfig {
@@ -35,5 +41,6 @@ export function parseEnvironment(environment: NodeJS.ProcessEnv): ApiConfig {
     host: parsed.data.HOST,
     port: parsed.data.PORT,
     logLevel: parsed.data.LOG_LEVEL,
+    adminApiJwtSecret: parsed.data.ADMIN_API_JWT_SECRET,
   };
 }

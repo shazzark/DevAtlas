@@ -7,7 +7,7 @@ import { buildApp } from "./app.js";
 loadDotEnv({ path: fileURLToPath(new URL("../.env", import.meta.url)) });
 
 const config = parseEnvironment(process.env);
-const app = buildApp(config);
+const app = await buildApp(config);
 
 try {
   await app.listen({ host: config.host, port: config.port });

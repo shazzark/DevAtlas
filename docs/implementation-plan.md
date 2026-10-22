@@ -111,12 +111,14 @@ Deliver vertical slices in the order below. Phase 1 establishes the product shel
 
 - **Objective:** Securely manage editorial lifecycle for all content types.
 - **Scope:** Selected auth mechanism, protected admin routes/API, role checks, draft/review/publish/withdraw/correction interfaces and audit provenance.
-- **Dependencies:** Content models from Phases 2–5 and owner-selected identity provider/credentials.
+- **Dependencies:** Content models from Phases 2–5; GitHub OAuth credentials and administrator numeric account IDs must be configured by the operator.
 - **Deliverables:** Private administration with clear editorial state transitions.
 - **Acceptance criteria:** Unauthorized access is denied server-side; only authorized editors can transition content; public APIs never expose drafts; review evidence is retained.
 - **Verification:** Auth/session and authorization negative-path tests, CSRF/security review as applicable, admin browser checks.
-- **Risks/blockers:** Identity provider is an owner decision and may require credentials; do not invent them or provide a fake-auth substitute.
-- **Completion conditions:** Selected provider works with credentials, controls tested and phase committed.
+- **Risks/blockers:** OAuth credentials, the administrator ID allow-list, and a shared signing secret are environment inputs. Admin remains closed when they are missing.
+- **Completion conditions:** Authenticated provider flow and protected workflows are tested with configured credentials, and the phase is committed.
+- **Observed implementation:** Added Auth.js GitHub OAuth with numeric account-ID allow-list, short-lived HS256 admin assertions between Next.js and Fastify, same-origin mutation checks, protected content CRUD/workflow and release review BFF, fail-closed Fastify verification, and an audit event collection for content changes, publishing, release review and monitoring. Admin publication requires explicit verification confirmation and a stored verification timestamp; published content must return to draft before edits. API reads have a global 3,000/minute ceiling, admin reads 60/minute, admin writes 20/minute, and source scans 3/minute. Stack/Build seeds now have null verification times and public queries reject published guide records lacking a verified timestamp.
+- **Verification:** Auth claim tests cover missing, denied, wrong-role/issuer and valid assertions; dedicated Mongo integration tests cover private access, create, submit, guarded publish, published public read and actor/action audit records. Admin Playwright checks cover setup state, unauthorized BFF reads and cross-origin mutation rejection. OAuth credentials are intentionally not present locally, so the real GitHub callback flow awaits operator configuration.
 
 ### Phase 7 - Search and discovery
 
@@ -129,6 +131,9 @@ Deliver vertical slices in the order below. Phase 1 establishes the product shel
 - **Risks/blockers:** Search quality at MVP volume; start with MongoDB indexes and avoid a separate search service.
 - **Completion conditions:** End-to-end search works with verified data; phase committed.
 
+- **Observed implementation:** Added a shared validated search contract and a MongoDB-backed Fastify endpoint that searches published technologies, releases with verification timestamps, and verified stack/build guides. Text-score relevance, category and technology filters, pagination, related-content recommendations, responsive web search UI, empty/unavailable states, and a same-origin Next.js proxy are in place. Related recommendations respect publication status and guide technology relationships. Daily aggregate metrics retain only content category and whether a keyword was used; TTL removes buckets after 366 days, with no raw terms or user identifiers stored.
+- **Verification:** Unit tests cover invalid filters, unavailable MongoDB and API response contracts. Isolated Mongo tests verify text relevance, category/technology filters, cross-category recommendations and suppression of unverified content. Browser checks cover empty results, accessible filters and mobile/tablet/desktop overflow. Full verification details are recorded after release checks below.
+
 ### Phase 8 - Production readiness
 
 - **Objective:** Prepare the integrated MVP for a selected launch environment.
@@ -139,6 +144,9 @@ Deliver vertical slices in the order below. Phase 1 establishes the product shel
 - **Verification:** Vitest, Playwright, strict typecheck, build, dependency/security review and target-host smoke check.
 - **Risks/blockers:** Hosting, Atlas network access, allowed origins and secret setup require owner/platform configuration.
 - **Completion conditions:** Evidence-based launch report with unresolved risks stated; no push/deploy without separate authorization.
+
+- **Observed preparation:** Added a dynamic public sitemap based on current published search results, robots rules excluding `/admin` and `/api`, `SITE_URL` validation and search no-index metadata. Added provider-neutral Node 22 deployment instructions for independently deployed web/API services, Atlas networking, private BFF connectivity, OAuth callback and required secrets. The API remains private by deployment topology; direct browser CORS is disabled. Host-specific checks and live OAuth/Atlas authentication remain outstanding because no production host or credentials were provided.
+- **Final local verification (22 October 2026):** `npm run typecheck` passed. `npm test` passed all 58 API tests and 9 shared tests, including MongoDB integration suites for Phases 1.5–6 against isolated local databases. `npm run build` passed with a production-shaped `SITE_URL`. Production Playwright passed 28 tests; one published-guide copy test skipped because the isolated E2E database has no published Build Guide. API readiness returned 200, and `/robots.txt` and `/sitemap.xml` returned 200 with the configured public origin. `npm audit --offline --omit=dev` reported zero vulnerabilities. `git diff --check` passed. A live GitHub OAuth callback, production Atlas network path, and target-host deployment smoke test remain unverified until the operator supplies those external settings.
 
 ## Change process
 

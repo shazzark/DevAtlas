@@ -4,3 +4,4 @@ export * from "./technologies.js";
 export * from "./releases.js";
 export * from "./stack-guides.js";
 export * from "./build-guides.js";
+export * from "./search.js";

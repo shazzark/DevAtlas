@@ -9,7 +9,7 @@ describe("Fastify health routes", () => {
 
   it("reports liveness without checking MongoDB", async () => {
     const checkDatabase = vi.fn(async () => { throw new Error("should not be called"); });
-    const app = buildApp(config, { checkDatabase });
+    const app = await buildApp(config, { checkDatabase });
     const response = await app.inject({ method: "GET", url: "/api/health" });
     await app.close();
 
@@ -19,7 +19,7 @@ describe("Fastify health routes", () => {
   });
 
   it("reports a safe unavailable response when the database check fails", async () => {
-    const app = buildApp(config, { checkDatabase: async () => { throw new Error("private connection detail"); } });
+    const app = await buildApp(config, { checkDatabase: async () => { throw new Error("private connection detail"); } });
     const response = await app.inject({ method: "GET", url: "/api/health/ready" });
     await app.close();
 
@@ -30,7 +30,7 @@ describe("Fastify health routes", () => {
 
   it("reports ready only after the database check resolves", async () => {
     const checkDatabase = vi.fn(async () => undefined);
-    const app = buildApp(config, { checkDatabase });
+    const app = await buildApp(config, { checkDatabase });
     const response = await app.inject({ method: "GET", url: "/api/health/ready" });
     await app.close();
 

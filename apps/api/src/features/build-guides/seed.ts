@@ -5,7 +5,6 @@ import { closeMongoConnection, connectMongo } from "../../infrastructure/databas
 import { TechnologyModel } from "../technologies/model.js";
 import { BuildGuideModel } from "./model.js";
 
-const lastVerifiedAt = new Date("2026-10-22T00:00:00.000Z");
 
 const guides = [
   {
@@ -222,7 +221,7 @@ try {
 
   await Promise.all(guides.map((guide) => BuildGuideModel.updateOne(
     { slug: guide.slug },
-    { $setOnInsert: { ...guide, lastVerifiedAt, status: "review" } },
+    { $setOnInsert: { ...guide, lastVerifiedAt: null, status: "review" } },
     { upsert: true, runValidators: true },
   )));
   console.log(`Ensured ${guides.length} Build Guides in review status; examples have not been represented as execution-tested.`);

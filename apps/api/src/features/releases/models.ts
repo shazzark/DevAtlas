@@ -33,6 +33,7 @@ releaseSchema.index({ sourceKey: 1, sourceReleaseId: 1 }, { unique: true, name: 
 releaseSchema.index({ status: 1, sourcePublishedAt: -1, _id: -1 }, { name: "published_release_feed" });
 releaseSchema.index({ status: 1, technologySlug: 1, sourcePublishedAt: -1, _id: -1 }, { name: "published_technology_releases" });
 releaseSchema.index({ status: 1, updatedAt: -1 }, { name: "release_review_queue" });
+releaseSchema.index({ title: "text", summary: "text", technologyName: "text", sourceExcerpt: "text" }, { name: "release_search" });
 
 const releaseSourceSchema = new Schema({
   sourceKey: { type: String, required: true, unique: true },

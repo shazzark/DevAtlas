@@ -12,10 +12,11 @@ const guideSlugs = ["phase5-fixture-public", "phase5-fixture-draft", "phase5-fix
 
 suite("build guide MongoDB integration", () => {
   const config = parseEnvironment({ MONGODB_URI: uri, HOST: "127.0.0.1", PORT: "4001", LOG_LEVEL: "silent" });
-  const app = buildApp(config, { checkDatabase: async () => undefined, closeDatabase: async () => undefined });
+  let app: Awaited<ReturnType<typeof buildApp>>;
 
   beforeAll(async () => {
     await mongoose.connect(uri!);
+    app = await buildApp(config, { checkDatabase: async () => undefined, closeDatabase: async () => undefined });
     await TechnologyModel.init();
     await BuildGuideModel.init();
     await TechnologyModel.deleteMany({ slug: { $in: technologySlugs } });

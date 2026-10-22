@@ -10,10 +10,11 @@ const fixtureSlugs = ["phase2-fixture-public", "phase2-fixture-public-2", "phase
 
 suite("technology MongoDB integration", () => {
   const config = parseEnvironment({ MONGODB_URI: uri, HOST: "127.0.0.1", PORT: "4001", LOG_LEVEL: "silent" });
-  const app = buildApp(config, { checkDatabase: async () => undefined, closeDatabase: async () => undefined });
+  let app: Awaited<ReturnType<typeof buildApp>>;
 
   beforeAll(async () => {
     await mongoose.connect(uri!);
+    app = await buildApp(config, { checkDatabase: async () => undefined, closeDatabase: async () => undefined });
     await TechnologyModel.init();
     await TechnologyModel.deleteMany({ slug: { $in: fixtureSlugs } });
     await TechnologyModel.create([
