@@ -14,7 +14,7 @@ The browser talks to the web app. Next.js calls Fastify through a server-only ty
 
 ## Requirements and setup
 
-- Node.js 20.9 or newer and npm
+- Node.js 22.12 or newer, below 25, and npm
 - MongoDB for readiness to report ready; the application can start without a database URI
 
 1. Run `npm install` from the repository root.

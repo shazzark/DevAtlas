@@ -12,9 +12,13 @@ import {
 
 const DEFAULT_API_BASE_URL = "http://127.0.0.1:4001";
 const REQUEST_TIMEOUT_MS = 4_000;
+const RETRY_DELAY_MS = 200;
+let retryInProgress = false;
 
 export class ApiClientError extends Error {
   constructor(readonly status: number, readonly body: unknown) { super(`Backend request failed with status ${status}`); this.name = "ApiClientError"; }
+
+  get temporary(): boolean { return this.status === 429 || this.status === 502 || this.status === 503 || this.status === 504; }
 }
 
 function apiUrl(path: string): URL {
@@ -30,17 +34,38 @@ function apiUrl(path: string): URL {
 }
 
 async function get<T>(path: string, parse: (body: unknown) => T): Promise<{ status: number; data: T }> {
-  const response = await fetch(apiUrl(path), {
-    method: "GET",
-    cache: "no-store",
-    headers: { accept: "application/json" },
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-  });
-  const body: unknown = await response.json();
-  if (["/api/technologies", "/api/releases", "/api/stacks", "/api/builds", "/api/build-guides", "/api/search"].some((prefix) => path.startsWith(prefix)) && !response.ok) {
-    throw new ApiClientError(response.status, body);
+  const url = apiUrl(path);
+  const request = async () => {
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        cache: "no-store",
+        headers: { accept: "application/json" },
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      });
+      const body: unknown = await response.json();
+      if (!response.ok) throw new ApiClientError(response.status, body);
+      return { status: response.status, data: parse(body) };
+    } catch (error) {
+      if (error instanceof ApiClientError) throw error;
+      // Network failures and the per-attempt timeout are temporary upstream failures.
+      throw new ApiClientError(503, { error: { code: "API_UNAVAILABLE", message: "Backend API is temporarily unavailable" } });
+    }
+  };
+
+  try {
+    return await request();
+  } catch (error) {
+    if (!(error instanceof ApiClientError) || !error.temporary || error.status === 429 || retryInProgress) throw error;
+    // Only one request per web process may retry at a time to limit a cold-start retry burst.
+    retryInProgress = true;
+    try {
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+      return await request();
+    } finally {
+      retryInProgress = false;
+    }
   }
-  return { status: response.status, data: parse(body) };
 }
 
 export const apiClient = {

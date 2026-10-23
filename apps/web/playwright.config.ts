@@ -17,7 +17,8 @@ export default defineConfig({
   ...(process.env.PLAYWRIGHT_BASE_URL ? {} : {
     webServer: {
       command: "npm run dev --prefix ../..",
-      url: `${baseURL}/api/health/ready`,
+      // The home page starts without Fastify or MongoDB; tests can then assert service availability separately.
+      url: `${baseURL}/`,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
     },

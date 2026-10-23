@@ -2,7 +2,7 @@
   "name": "devatlas-monorepo",
   "version": "1.0.0",
   "private": true,
-  "engines": { "node": ">=20.9.0" },
+  "engines": { "node": ">=22.12.0 <25.0.0" },
   "workspaces": ["apps/web", "apps/api", "packages/shared"],
   "scripts": {
     "dev": "npm run build --workspace=@devatlas/shared && concurrently -k -n api,web \"npm run dev --workspace=@devatlas/api\" \"npm run dev --workspace=@devatlas/web\"",
